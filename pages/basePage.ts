@@ -1,37 +1,44 @@
 // pages/basePage.ts
 import { Page, Locator } from '@playwright/test';
+import { CommonUtils } from '../utils/commonUtils';
 
 export class BasePage {
   readonly page: Page;
+  readonly utils: CommonUtils;
 
   constructor(page: Page) {
     this.page = page;
+    this.utils = new CommonUtils(page);
   }
 
-  // Click on any locator
+  // ⭐ Updated click with auto-highlight
   async click(locator: Locator) {
-    await locator.click();
+    await this.utils.click(locator);
   }
 
-  // Fill input fields
+  // ⭐ Updated fill with auto-highlight
   async fill(locator: Locator, text: string) {
-    await locator.fill(text);
+    await this.utils.fill(locator, text);
   }
 
-  // Wait until element is visible (optional custom timeout)
+  // ⭐ Optional: type() with auto-highlight
+  async type(locator: Locator, text: string) {
+    await this.utils.type(locator, text);
+  }
+
+  // Wait until element is visible
   async waitForVisible(locator: Locator, timeout?: number) {
-    await locator.waitFor({ state: 'visible', timeout });
+    await this.utils.waitForVisible(locator, timeout);
   }
 
-  // Get text from a locator
+  // Get text
   async getText(locator: Locator): Promise<string> {
-    return (await locator.textContent()) ?? '';
+    return this.utils.getText(locator);
   }
 
-  // Navigate to a URL without hardcoded timeout
+  // Navigate to a URL
   async navigateTo(url: string) {
     console.log('Navigating to:', url);
-    // Use 'domcontentloaded' to avoid SPA networkidle issues
     await this.page.goto(url, { waitUntil: 'domcontentloaded' });
   }
 }

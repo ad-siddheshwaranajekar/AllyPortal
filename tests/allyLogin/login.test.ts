@@ -4,7 +4,7 @@ import { LoginPage } from '../../pages/login/loginPage';
 test.describe('Login Module', () => {
 
   // Positive test - valid credentials (Smoke)
-  test('Login with valid credentials @smoke', async ({ page }) => {
+  test('Login with valid credentials @smoke @regression', async ({ page }) => {
     test.setTimeout(70000); // Entire test timeout
 
     const loginPage = new LoginPage(page);
