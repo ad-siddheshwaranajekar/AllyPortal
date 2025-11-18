@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/login/loginPage';
+import  loginData  from '../../testData/loginData.json';  
 
 test.describe('Login Module', () => {
 
@@ -13,7 +14,8 @@ test.describe('Login Module', () => {
     await loginPage.navigate();
 
     // Perform login
-    await loginPage.login('JordanDavis77', '123#Qwertyuiop');
+    //await loginPage.login('JordanDavis77', '123#Qwertyuiop');
+    await loginPage.login(loginData[0].username, loginData[0].password);  
 
     // Users page validation
     const usersHeader = page.locator("//h3[normalize-space()='Users']");
@@ -31,7 +33,8 @@ test.describe('Login Module', () => {
     await loginPage.navigate();
 
     // Perform login with wrong credentials
-    await loginPage.login('invalidUser', 'wrongPass');
+    //await loginPage.login('invalidUser', 'wrongPass');
+    await loginPage.login(loginData[1].username, loginData[1].password);
 
     // Validate error alert
     const errorAlert = page.locator(

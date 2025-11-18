@@ -1,0 +1,12 @@
+[
+  {
+    "username": "JordanDavis77",
+    "password": "123#Qwertyuiop"
+   
+  },
+  {
+    "username": "invalidUser",
+    "password": "wrongPass"
+   
+  }
+]
