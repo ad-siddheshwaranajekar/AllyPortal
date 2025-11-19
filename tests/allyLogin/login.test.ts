@@ -3,22 +3,16 @@ import { LoginPage } from '../../pages/login/loginPage';
 import  loginData  from '../../testData/loginData.json';  
 
 test.describe('Login Module', () => {
-
-  // Positive test - valid credentials (Smoke)
+ 
   test('Login with valid credentials @smoke @regression', async ({ page }) => {
-    test.setTimeout(70000); // Entire test timeout
+  //test.setTimeout(70000); 
 
     const loginPage = new LoginPage(page);
-
-    // Navigate to login page (QA or UAT)
+  
     await loginPage.navigate();
-
-    // Perform login
-    //await loginPage.login('JordanDavis77', '123#Qwertyuiop');
     await loginPage.login(loginData[0].username, loginData[0].password);  
 
-    // Users page validation
-    const usersHeader = page.locator("//h3[normalize-space()='Users']");
+     const usersHeader = page.locator("//h3[normalize-space()='Users']");
     await expect(usersHeader).toBeVisible({ timeout: 15000 });
     await expect(usersHeader).toHaveText('Users');
   });
