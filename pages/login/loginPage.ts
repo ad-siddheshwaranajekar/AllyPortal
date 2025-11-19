@@ -2,6 +2,7 @@ import { Page, Locator } from "@playwright/test";
 import { BasePage } from "../basePage";
 import { CURRENT_ENV } from "../../tests/config/env";
 import { CommonUtils } from "../../utils/commonUtils";
+import loginData from '../../testData/loginData.json';
 
 // Use environment variable at runtime instead of a missing module import.
 
@@ -32,4 +33,11 @@ export class LoginPage extends BasePage {
     await this.click(this.loginButton);
    // await this.page.waitForLoadState('networkidle');
   }
+
+
+  async loginAsAlly() {
+   // await this.navigate();
+    await this.login(loginData[0].username, loginData[0].password);
+
+}
 }

@@ -10,7 +10,8 @@ test.describe('Login Module', () => {
     const loginPage = new LoginPage(page);
   
     await loginPage.navigate();
-    await loginPage.login(loginData[0].username, loginData[0].password);  
+    await loginPage.loginAsAlly(); //loginmethod called here
+   // await loginPage.login(loginData[0].username, loginData[0].password);  
 
      const usersHeader = page.locator("//h3[normalize-space()='Users']");
     await expect(usersHeader).toBeVisible({ timeout: 15000 });
