@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+//import { test, expect } from '../../utils/Wrapper/customTest';
 import { LoginPage } from '../../pages/login/loginPage';
 import  loginData  from '../../testData/loginData.json';  
 
@@ -7,7 +8,7 @@ test.describe('Login Module', () => {
   test('Login with valid credentials @smoke @regression', async ({ page }) => {
   //test.setTimeout(70000); 
 
-    const loginPage = new LoginPage(page);
+    const loginPage = new LoginPage(page); //test
   
     await loginPage.navigate();
     await loginPage.loginAsAlly(); //loginmethod called here
@@ -40,8 +41,7 @@ test.describe('Login Module', () => {
     await expect(errorAlert).toHaveText(
       'We could not log you in. Please check your credentials and try again.'
     );
-
-    
+ 
   });
 
 });

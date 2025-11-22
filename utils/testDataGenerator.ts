@@ -8,8 +8,16 @@ export function generateUser() {
   return {
     firstName,
     lastName,
-    username: `${firstName}${twoDigits}`,                    // Dhanush01
-    email: `${firstName}.${twoDigits}@yopmail.com`, // Dhanush.Kumar23@yopmail.com
-    phone: faker.phone.number("##########")                  // Random 10-digit phone
+    username: `${firstName}${twoDigits}${twoDigits}`,       // Dhanush01
+    email: `${firstName}.${twoDigits}@yopmail.com`,        // Dhanush.Kumar23@yopmail.com
+    phone: faker.phone.number("##########")                // Random 10-digit phone
   };
+}
+
+// ----------------------
+// New function for webhook URL
+// ----------------------
+export function generateWebhookUrl(baseUrl = 'https://ally.qat.anddone.com/#/ally/webhooks'): string {
+  const randomNumber = faker.number.int({ min: 1000, max: 9999 }); // random 4-digit number
+  return `${baseUrl}${randomNumber}`;
 }
