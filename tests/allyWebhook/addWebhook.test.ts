@@ -33,8 +33,11 @@ test.describe("Add ally webhook tests", () => {
 
     // Select version
     await webhookPage.versionDropdown.click();
-    
+    await page.waitForTimeout(1000); // Wait for options to load
     await webhookPage.versionDropdown.selectOption("1");
+
+
+
     
 
     // Save
@@ -55,7 +58,11 @@ test.describe("Add ally webhook tests", () => {
   await webhookPage.addWebhookBtn.click();
   await webhookPage.setWebhookUrl(duplicateUrl);
   await webhookPage.selectModules('Transaction');
+
+
+   // Select version
   await webhookPage.versionDropdown.click();
+  await page.waitForTimeout(1000); // Wait for options to load
   await webhookPage.versionDropdown.selectOption("1");
   await webhookPage.saveButton.click();
   const errorMessage = webhookPage.duplicateErrorMessage;

@@ -127,7 +127,9 @@ test.describe("Add ally users tests", () => {
 await page.waitForSelector(".toast-message", { timeout: 15000 });
 
 await expect(addUserPage.errorAlert).toBeVisible();
-  
+
+
+
 
   });
 });
