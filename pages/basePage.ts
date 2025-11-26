@@ -1,14 +1,26 @@
 // pages/basePage.ts
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect} from '@playwright/test';
 import { CommonUtils } from '../utils/commonUtils';
 
 export class BasePage {
   readonly page: Page;
   readonly utils: CommonUtils;
 
+readonly  itemsPerPageDropdown: Locator;
+readonly itemsPerPageOptions: Locator;
+readonly tableRows: Locator;
+
+
   constructor(page: Page) {
     this.page = page;
     this.utils = new CommonUtils(page);
+    this.itemsPerPageDropdown = page.locator('#maxPerPage');
+this.itemsPerPageOptions = page.locator('#maxPerPage option');
+
+    this.tableRows = page.locator('div.table-container table tbody tr');  
+
+
+
   }
 
   // ⭐ Updated click with auto-highlight
@@ -41,4 +53,21 @@ export class BasePage {
     console.log('Navigating to:', url);
     await this.page.goto(url, { waitUntil: 'domcontentloaded' });
   }
+
+
+//Items per page selection
+  async selectItemsPerPage(count: number) {
+    await this.itemsPerPageDropdown.selectOption(count.toString());
+    await this.utils.waitForVisible(this.tableRows.first(), 90000);
+  }
+ async validateItemsPerPageOptions() {
+  await this.itemsPerPageDropdown.click();
+    const expected = ['10', '25', '50'];
+    const actual = (await this.itemsPerPageOptions.allTextContents()).map(t => t.trim());
+    expect(actual).toEqual(expected);
+  }
+
+
+
+
 }

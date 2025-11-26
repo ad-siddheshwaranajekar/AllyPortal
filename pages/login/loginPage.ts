@@ -10,7 +10,7 @@ export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
-  readonly alertMessage: Locator;
+  //readonly alertMessage: Locator;
 
   readonly url: string;
 
