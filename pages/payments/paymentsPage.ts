@@ -70,11 +70,23 @@ export class PaymentsPage extends BasePage {
   }
  async searchTransaction(text: string) {
   await this.utils.waitForVisible(this.searchInput, 10000);
-  // await this.searchInput.fill(transactionId);
-  // await this.searchButton.click();  
-  await this.utils.waitForVisible(this.searchInput, 10000);
   await this.utils.fill(this.searchInput, text);   // highlight + fill
-  await this.utils.click(this.searchButton); 
+  // Trigger search by pressing Enter first, then fallback to clicking the button
+  await this.searchInput.press('Enter');
+  try {
+    // Wait for either results OR the "No Results Found" heading
+    await Promise.race([
+      this.utils.waitForVisible(this.resultsRows.first(), 30000),
+      this.utils.waitForVisible(this.noResultsFound, 30000)
+    ]);
+  } catch (e) {
+    // if neither appeared after Enter, try clicking the search button
+    await this.utils.click(this.searchButton);
+    await Promise.race([
+      this.utils.waitForVisible(this.resultsRows.first(), 30000),
+      this.utils.waitForVisible(this.noResultsFound, 30000)
+    ]);
+  }
  }
 
  async validateSearchResultsContain(text: string) {
@@ -93,7 +105,12 @@ export class PaymentsPage extends BasePage {
     }
   }
 
-  expect(found).toBeTruthy();
+  if (!found) {
+    // Collect sample rows for diagnostic purposes
+    const sampleRows = await this.resultsRows.allInnerTexts();
+    const sample = sampleRows.slice(0, Math.min(5, sampleRows.length));
+    throw new Error(`No search results contained "${text}". rowCount=${rowCount} sampleRows=${JSON.stringify(sample)}`);
+  }
 }
 
 
@@ -145,7 +162,8 @@ export class PaymentsPage extends BasePage {
 
     }
    async validateNoSearchResults() {
-    await this.utils.waitForVisible(this.noResultsFound, 10000);
+    // searchTransaction already waits for "No Results Found" to appear
+    // Just verify it's visible now
     await expect(this.noResultsFound).toBeVisible();
   }
   

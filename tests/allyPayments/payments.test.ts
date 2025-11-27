@@ -10,7 +10,7 @@ import { RefundTestData } from '../../testData/testDataTypes';
 import refundData from '../../testData/refundData.json';  
 
 
-const refundTestData: RefundTestData[] = refundData;
+
 
  test.describe('Payments Module', () => {
   let loginPage: LoginPage;
@@ -81,28 +81,35 @@ const refundTestData: RefundTestData[] = refundData;
   test('Validate teh invalid search shows no results @regression', async ({page}) => {
 
     await paymentsPage.validatePaymentsPageLoaded();
-    await page.waitForTimeout(2000); // Wait for any dynamic content to load
+    // Ensure search input is visible then perform invalid search
+    await paymentsPage.utils.waitForVisible(paymentsPage.searchInput, 5000);
+    await page.waitForTimeout(3000);
     const text = 'invalid-transaction-id-12345'; // Example invalid transaction ID
-    await page.waitForTimeout(2000);
-    await paymentsPage.searchTransaction(text); 
+    
+    await paymentsPage.searchTransaction(text);
+    // Give the UI time to process and display "No Results Found"
     await page.waitForTimeout(2000);
     await paymentsPage.validateNoSearchResults(); 
    });
 
-//    test('Validate sorting for Payments Table columns @regression', async ({ page }) => {
-//   await paymentsPage.validatePaymentsPageLoaded();
-//  await page.waitForTimeout(10000); // Wait for any dynamic content to load
-//   await paymentsPage.validateSorting(
-//     paymentsPage.headerDBAName,
-//     paymentsPage.colDBAName
-//   );
-// await page.waitForTimeout(10000); 
-//   await paymentsPage.validateSorting(
-//     paymentsPage.headerDBAName,
-//     paymentsPage.colDBAName
-//   );
- //
-// });
+   test('Validate sorting for Payments Table columns @regression', async ({ page }) => {
+  await paymentsPage.validatePaymentsPageLoaded();
+ // Wait for header and first column cells to be visible instead of blind sleep
+  await paymentsPage.utils.waitForVisible(paymentsPage.headerDBAName, 20000);
+  await paymentsPage.utils.waitForVisible(paymentsPage.colDBAName.first(), 20000);
+  await paymentsPage.validateSorting(
+    paymentsPage.headerDBAName,
+    paymentsPage.colDBAName
+  );
+
+  // Ensure table settled before re-sorting
+  await paymentsPage.utils.waitForVisible(paymentsPage.colDBAName.first(), 10000);
+  await paymentsPage.validateSorting(
+    paymentsPage.headerDBAName,
+    paymentsPage.colDBAName
+  );
+ 
+});
  
   
   
@@ -121,8 +128,41 @@ const refundTestData: RefundTestData[] = refundData;
   //   });
 
   //await paymentsPage.validateSearchResultStatus(searchResult);
+ test('Validate that the Ally is able to see all refund transactions associated with the original transaction ID @regression', async ({ page }) => {
+    const Tid = 'c39140e1-fc9c-4177-8b60-4b0332a79348';
 
-   });
+    // Navigate to login and sign in with provided credentials
+    // await loginPage.navigateTo(CURRENT_ENV);
 
+    // await loginPage.loginAsAlly();
 
+    // Verify Users page is displayed (side menu Users link visible)
+    await sideMenuPage.utils.waitForVisible(sideMenuPage.usersMenu, 10000);
+    await expect(sideMenuPage.usersMenu).toBeVisible();
 
+    await page.waitForTimeout(1000);
+
+    // Open Payments from side menu
+    await sideMenuPage.openPayments();
+    await paymentsPage.validatePaymentsPageLoaded();
+
+    // Search for the ID and validate results
+    await paymentsPage.searchTransaction(Tid);
+
+    await page.waitForTimeout(2000);
+    // searchTransaction already waits for results, no additional sleep needed
+    await paymentsPage.validateSearchResultsContain(Tid);
+    await page.waitForTimeout(2000);
+
+    // Find the row that contains the ID
+    const matchedRow = paymentsPage.resultsRows.filter({ hasText: Tid }).first();
+    await matchedRow.waitFor({ state: 'visible', timeout: 30000 });
+
+    // Click the 'Status' cell (status is expected in the 10th column / index 9)
+    const statusCell = matchedRow.locator('td').nth(9);
+    await statusCell.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(statusCell).toContainText('Refunded');
+    await statusCell.click();
+  });
+
+ });  
