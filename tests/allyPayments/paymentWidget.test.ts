@@ -1,5 +1,6 @@
 import { test, expect, request } from '@playwright/test';
 import paymentTestData from '../../testData/Payments/paymentTestdate.json';
+import { PaymentWidgetPage } from '../../pages/payments/PaymentWidgetPage';
 
 test('Create Payment Token → Open Payment Widget', async ({ page }) => {
 
@@ -37,6 +38,8 @@ test('Create Payment Token → Open Payment Widget', async ({ page }) => {
   const finalURL = `${paymentTestData.paymentWidgetURL}${paymentToken}`;
   await page.goto(finalURL);
 
+  const paymentWidgetPage = new PaymentWidgetPage(page);
+  await paymentWidgetPage.verifyPageLoaded();
   
  // await page.waitForSelector('text=Payment', { timeout: 15000 });
 

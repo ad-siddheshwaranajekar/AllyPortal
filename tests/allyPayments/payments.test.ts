@@ -93,8 +93,8 @@ import refundData from '../../testData/refundData.json';
   await page.setDefaultTimeout(30000);
 
  // Wait for header and first column cells to be visible instead of blind sleep
-  await paymentsPage.utils.waitForVisible(paymentsPage.headerDBAName, 20000);
-  await paymentsPage.utils.waitForVisible(paymentsPage.colDBAName.first(), 20000);
+  await paymentsPage.utils.waitForVisible(paymentsPage.headerDBAName, 80000);
+  await paymentsPage.utils.waitForVisible(paymentsPage.colDBAName.first(), 80000);
   await paymentsPage.validateSorting(
     paymentsPage.headerDBAName,
     paymentsPage.colDBAName

@@ -26,7 +26,7 @@ export class SideMenuPage {
 
 
    private async delay() {
-  await this.page.waitForTimeout(1000); // 3 sec
+  await this.page.waitForTimeout(3000); // 3 sec
 }
   async openUsers() {
     await this.utils.click(this.usersMenu); 

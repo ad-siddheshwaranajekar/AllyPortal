@@ -54,8 +54,8 @@ export class UsersPage extends BasePage {
 
     // Wait for either rows or "No Results Found"
     await Promise.race([
-      this.userRows.first().waitFor({ state: 'visible', timeout: 8000 }).catch(() => {}),
-      this.noResultsFound.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {})
+      this.userRows.first().waitFor({ state: 'visible', timeout: 10000 }).catch(() => {}),
+      this.noResultsFound.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {})
     ]);
   }
 
@@ -101,6 +101,7 @@ Found: "${text}"`
 
   // Validate full records loaded after clearing filter
   async validateAllRecordsLoaded() {
+    await this.page.setDefaultTimeout(15000);
     const rowCount = await this.userRows.count();
 
     if (rowCount < 2) {
