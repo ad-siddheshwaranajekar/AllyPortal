@@ -26,20 +26,18 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
 
-    # Upload FIRST report
-    - name: Upload Playwright Report
+    - name: Upload Playwright HTML Report
       uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
+        name: playwright-html-report
         path: playwright-report/
         retention-days: 30
 
-    # Upload SECOND report
-    - name: Upload My Report
+    - name: Upload Ortoni Report
       uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: my-report
+        name: ortoni-report
         path: my-report/
         retention-days: 30
