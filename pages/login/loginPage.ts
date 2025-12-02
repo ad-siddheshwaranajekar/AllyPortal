@@ -38,7 +38,8 @@ export class LoginPage extends BasePage {
 
   async loginAsAlly() {
    // await this.navigate();
-    await this.login(loginData[0].username, loginData[0].password);
+   // await this.login(loginData[0].username, loginData[0].password); //QAT
+    await this.login(loginData[1].username, loginData[1].password); //UAT
 
 }
 }

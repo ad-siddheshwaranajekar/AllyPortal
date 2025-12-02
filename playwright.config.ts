@@ -46,8 +46,8 @@ export default defineConfig({
 
   //  Existing HTML report + Allure added
   reporter: [
-     ["ortoni-report", reportConfig],
-   // ['html']   
+   //  ["ortoni-report", reportConfig],
+    ['html']   
                     // existing
         
   ],
@@ -62,7 +62,7 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'chromium',
+      name: 'Allly_chromium',
       use: {
         ...devices['Desktop Chrome'],
         viewport: null,

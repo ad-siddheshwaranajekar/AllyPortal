@@ -30,7 +30,7 @@ test.describe('Login Module', () => {
 
     // Perform login with wrong credentials
     //await loginPage.login('invalidUser', 'wrongPass');
-    await loginPage.login(loginData[1].username, loginData[1].password);
+    await loginPage.login(loginData[2].username, loginData[2].password);
 
     // Validate error alert
     const errorAlert = page.locator(

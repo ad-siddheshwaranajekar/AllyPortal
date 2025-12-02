@@ -1,8 +1,13 @@
 import { test, expect, request } from '@playwright/test';
 import paymentTestData from '../../testData/Payments/paymentTestdate.json';
 import { PaymentWidgetPage } from '../../pages/payments/PaymentWidgetPage';
+import { de } from '@faker-js/faker';
 
-test('Create Payment Token → Open Payment Widget', async ({ page }) => {
+
+test.describe('Payment Widget Tests', () => {
+  
+
+test('Verify Create Payment Token → Open Payment Widget for ACH', async ({ page }) => {
 
   const apiContext = await request.newContext({
     baseURL: paymentTestData.baseURL,
@@ -12,24 +17,16 @@ test('Create Payment Token → Open Payment Widget', async ({ page }) => {
     }
   });
 
-  // Generate dynamic title
   const dynamicTitle = `PlaywrightTitle_${Date.now()}`;
-
-  // Generate random amount between 200 and 500
   const randomAmount = Math.floor(Math.random() * (500 - 200 + 1)) + 200;
 
-  // Clone requestBody and override title and amount
   const requestBody = {
     ...paymentTestData.requestBody,
     title: dynamicTitle,
     amount: randomAmount
   };
 
-  console.log('🔹 Request Body:\n', JSON.stringify(requestBody, null, 2));
-
   const response = await apiContext.post('', { data: requestBody });
-
-  // Hardcoded 201 check
   expect(response.status()).toBe(201);
 
   const data = await response.json();
@@ -40,11 +37,152 @@ test('Create Payment Token → Open Payment Widget', async ({ page }) => {
 
   const paymentWidgetPage = new PaymentWidgetPage(page);
   await paymentWidgetPage.verifyPageLoaded();
-  
- // await page.waitForSelector('text=Payment', { timeout: 15000 });
 
-  console.log(' Payment Token:', paymentToken);
-  console.log(' Amount:', randomAmount);
-  console.log(' Opening Widget:', finalURL);
-  console.log('✅ Payment widget opened successfully');
+  // 🔽🔽 UI FLOW STARTS HERE 🔽🔽
+
+  await expect(page).toHaveTitle(/AndDone JS/);
+  await paymentWidgetPage.fillBankDetails({
+  accountHolder: 'Siddheshwar QAT',
+  routingNumber: '124003116',
+  accountNumber: '123456789'
+});
+await page.waitForTimeout(1000);
+await paymentWidgetPage.submitPayment();
+await page.waitForTimeout(5000);
+await expect(paymentWidgetPage.sueccessMessage).toHaveText('Thank you for your payment!');    
+  console.log('Payment Token:', paymentToken);
+  console.log('Amount:', randomAmount);
+  console.log('Widget URL:', finalURL);
+});
+
+test('Verify Create Payment Token → Open Payment Widget for CC', async ({ page }) => {
+  // Test logic for CC
+  const apiContext = await request.newContext({
+    baseURL: paymentTestData.baseURL,
+    extraHTTPHeaders: {
+      ...paymentTestData.headers,
+      'Content-Type': paymentTestData.contentType
+    }
+  });
+
+  const dynamicTitle = `PlaywrightTitle_${Date.now()}`;
+  const randomAmount = Math.floor(Math.random() * (500 - 200 + 1)) + 200;
+
+  const requestBody = {
+    ...paymentTestData.requestBody,
+    title: dynamicTitle,
+    amount: randomAmount
+  };
+
+  const response = await apiContext.post('', { data: requestBody });
+  expect(response.status()).toBe(201);
+
+  const data = await response.json();
+  const paymentToken = data.paymentToken;
+
+  const finalURL = `${paymentTestData.paymentWidgetURL}${paymentToken}`;
+  await page.goto(finalURL);
+
+  const paymentWidgetPage = new PaymentWidgetPage(page);
+  await paymentWidgetPage.verifyPageLoaded();
+
+  // 🔽🔽 UI FLOW STARTS HERE 🔽🔽
+
+  await expect(page).toHaveTitle(/AndDone JS/);
+  await paymentWidgetPage.selectCard();
+  await page.waitForTimeout(1000);
+  await paymentWidgetPage.fillCCardDetails({
+    nameOnCard: 'Siddheshwar QAT',
+    cardNumber: '370000000000002',
+    expiry: '0330',
+    cvv: '7373'
+  });
+  await page.waitForTimeout(1000);
+  await paymentWidgetPage.billingAddress({
+    address: '123 Main St',
+    suite: 'Apt 1',
+    city: 'Anytown',
+    postalCode: '12345' 
+  })
+  await page.waitForTimeout(5000);
+  await paymentWidgetPage.submitPayment();
+   await page.waitForTimeout(5000);
+  await expect(paymentWidgetPage.sueccessMessage).toHaveText('Thank you for your payment!');    
+  console.log('Payment Token:', paymentToken);
+  console.log('Amount:', randomAmount);
+  console.log('Widget URL:', finalURL);
+});
+
+test('Verify Create Payment Token → Open Payment Widget for debit card', async ({ page }) => {
+  // Test logic for PayPal
+
+  // Test logic for CC
+  const apiContext = await request.newContext({
+    baseURL: paymentTestData.baseURL,
+    extraHTTPHeaders: {
+      ...paymentTestData.headers,
+      'Content-Type': paymentTestData.contentType
+    }
+  });
+
+  const dynamicTitle = `PlaywrightTitle_${Date.now()}`;
+  const randomAmount = Math.floor(Math.random() * (500 - 200 + 1)) + 200;
+
+  const requestBody = {
+    ...paymentTestData.requestBody,
+    title: dynamicTitle,
+    amount: randomAmount
+  };
+
+  const response = await apiContext.post('', { data: requestBody });
+  expect(response.status()).toBe(201);
+
+  const data = await response.json();
+  const paymentToken = data.paymentToken;
+
+  const finalURL = `${paymentTestData.paymentWidgetURL}${paymentToken}`;
+  await page.goto(finalURL);
+
+  const paymentWidgetPage = new PaymentWidgetPage(page);
+  await paymentWidgetPage.verifyPageLoaded();
+
+  // 🔽🔽 UI FLOW STARTS HERE 🔽🔽
+
+  await expect(page).toHaveTitle(/AndDone JS/);
+  await paymentWidgetPage.selectCard();
+  await page.waitForTimeout(1000);
+  await paymentWidgetPage.fillDCardDetails({
+    nameOnCard: 'SiddheshwarDebitCard',
+    cardNumber: '5555555555554444',
+    expiry: '0330',
+    cvv: '737'
+  });
+  await page.waitForTimeout(1000);
+  await paymentWidgetPage.billingAddress({
+    address: '123 Main St',
+    suite: 'Apt 1',
+    city: 'Anytown',
+    postalCode: '12345' 
+  })
+  await page.waitForTimeout(1000);
+  await paymentWidgetPage.submitPayment();
+   await page.waitForTimeout(5000);
+  await expect(paymentWidgetPage.sueccessMessage).toHaveText('Thank you for your payment!');    
+  console.log('Payment Token:', paymentToken);
+  console.log('Amount:', randomAmount);
+  console.log('Widget URL:', finalURL);
+});
+
+test('Verify the validation for alredy used payment token', async ({ page }) => {
+  const paymentWidgetPage = new PaymentWidgetPage(page);
+  await page.goto('https://paymentwidget.qat.anddone.com/?token=DxLkeK6v');
+
+  await expect(page).toHaveTitle(/AndDone JS/);
+ await expect(paymentWidgetPage.alreadyProcessedMessage).toBeVisible({ timeout: 5000 });
+ await page.waitForTimeout(5000);
+console.log('Alert Message:', await paymentWidgetPage.alreadyProcessedMessage.textContent()); 
+
+
+  });
+  
 });

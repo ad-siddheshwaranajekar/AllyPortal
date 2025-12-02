@@ -51,7 +51,7 @@ test.describe('Users - Search/Filter/Table', () => {
 
     await usersPage.searchUser(username);
     await usersPage.validateSearchResults(username);
-
+    
     await usersPage.clearSearch();
     await usersPage.validateAllRecordsLoaded();
   });
