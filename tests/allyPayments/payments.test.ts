@@ -18,16 +18,12 @@ import refundData from '../../testData/refundData.json';
   let paymentsPage: PaymentsPage;
   let commonUtils: CommonUtils; 
 
- 
-
-
-    test.beforeEach(async ({page}) => { 
+     test.beforeEach(async ({page}) => { 
     loginPage = new LoginPage(page);    
     sideMenuPage = new SideMenuPage(page);
     paymentsPage = new PaymentsPage(page);
     commonUtils = new CommonUtils(page);    
-      
-
+     
     // Login and navigate to Payments page
     await loginPage.navigateTo(CURRENT_ENV);
     await loginPage.loginAsAlly();
@@ -94,6 +90,8 @@ import refundData from '../../testData/refundData.json';
 
    test('Validate sorting for Payments Table columns @regression', async ({ page }) => {
   await paymentsPage.validatePaymentsPageLoaded();
+  await page.setDefaultTimeout(30000);
+
  // Wait for header and first column cells to be visible instead of blind sleep
   await paymentsPage.utils.waitForVisible(paymentsPage.headerDBAName, 20000);
   await paymentsPage.utils.waitForVisible(paymentsPage.colDBAName.first(), 20000);
@@ -103,6 +101,8 @@ import refundData from '../../testData/refundData.json';
   );
 
   // Ensure table settled before re-sorting
+
+ await page.setDefaultTimeout(30000);
   await paymentsPage.utils.waitForVisible(paymentsPage.colDBAName.first(), 10000);
   await paymentsPage.validateSorting(
     paymentsPage.headerDBAName,

@@ -11,7 +11,7 @@ export class AddUserPage extends BasePage {
         this.url = `${CURRENT_ENV}/users/add`;
     }
 
-
+    
     readonly AddUserBtn= this.page.locator("//div[@class='header']//div[@class='button button-green']");
     readonly AddUserTxt= this.page.getByText('Add User', { exact: true });
     readonly userNameTxt= this.page.getByRole('textbox', { name: '*Username' });
@@ -31,6 +31,15 @@ export class AddUserPage extends BasePage {
 
  readonly errorAlert = this.page.locator(".toast-message", { hasText: "User name already exists" });
        
+ readonly actionButton= this.page.locator('button.action-button');
+ readonly deactivateButton= this.page.locator(':text("Deactivate")');
+ readonly activateButton= this.page.locator(':text("Activate")');
+ 
+readonly tableRows = this.page.locator('div.table-container table tbody tr');
+// First row
+readonly firstRow = this.tableRows.first();
+// Ellipsis inside first row
+readonly firstRowEllipsis = this.firstRow.locator('span.material-symbols-outlined');
 
 
 

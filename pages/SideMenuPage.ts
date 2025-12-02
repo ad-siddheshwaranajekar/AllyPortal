@@ -23,12 +23,20 @@ export class SideMenuPage {
     this.profileMenu = page.locator('p.profile-name');
   }
 
+
+
+   private async delay() {
+  await this.page.waitForTimeout(1000); // 3 sec
+}
   async openUsers() {
-    await this.utils.click(this.usersMenu);   // now works
+    await this.utils.click(this.usersMenu); 
+    await this.delay();  // now works
   }
 
   async openPayments() {
     await this.utils.click(this.paymentsMenu);
+    await this.page.waitForTimeout(3000); 
+    //await this.delay(); 
   } 
 
   async openWebhooks() {

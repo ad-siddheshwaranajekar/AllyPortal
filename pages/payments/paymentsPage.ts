@@ -6,15 +6,15 @@ import { BasePage } from '../basePage';
 export class PaymentsPage extends BasePage {
   readonly page: Page;
   readonly utils: CommonUtils;
-
+  //payemnt table
   readonly headerTxt: Locator;
   readonly filterTable: Locator;
   readonly transactionsTable: Locator;
-
+// Search 
   readonly searchInput: Locator;    
   readonly searchButton: Locator;
   readonly resultsRows: Locator;
-
+//count
   readonly transactionCount: Locator;
 
   //header name
@@ -155,7 +155,7 @@ export class PaymentsPage extends BasePage {
 
 
       for (const headerName of expectedHeaderNames) {
-        const headerLocator = this.page.locator('div.table-container table thead tr th', { hasText: headerName });
+            const headerLocator = this.page.locator('div.table-container table thead tr th', { hasText: headerName });
         await this.utils.waitForVisible(headerLocator, 10000);
         await expect(headerLocator).toBeVisible();
       }
@@ -189,43 +189,46 @@ async validateSorting(header: Locator, column: Locator) {
   expect(descValues).toEqual(sortedDesc);
 }
 
-  //Refund search validation
+
+
+ 
+//  NOTE >> DO NOT Update under this Refund search validation
   // Validate Refund Transaction and Nested Refund Settlement Row
-async validateRefundFlow(searchText: string, expectedMainStatus: string, expectedNestedStatus: string) {
-  
-  // 1️⃣ Wait for table to load
-  await this.page.waitForSelector('div.table-container table tbody tr');
+    async validateRefundFlow(searchText: string, expectedMainStatus: string, expectedNestedStatus: string) {
+      
+      // 1️⃣ Wait for table to load
+      await this.page.waitForSelector('div.table-container table tbody tr');
 
-  // 2️⃣ Try matching full ID first
-  let mainRow = this.page.locator('tbody tr', { hasText: searchText }).first();
+      // 2️⃣ Try matching full ID first
+      let mainRow = this.page.locator('tbody tr', { hasText: searchText }).first();
 
-  if (!(await mainRow.count())) {
-    // 3️⃣ If full ID not found, match first 8–12 characters
-    const partialId = searchText.substring(0, 10);  // UI probably displays a short version
-    mainRow = this.page.locator('tbody tr', { hasText: partialId }).first();
-  }
+      if (!(await mainRow.count())) {
+        // 3️⃣ If full ID not found, match first 8–12 characters
+        const partialId = searchText.substring(0, 10);  // UI probably displays a short version
+        mainRow = this.page.locator('tbody tr', { hasText: partialId }).first();
+      }
 
-  // 4️⃣ If still no match → FAIL EARLY with meaningful message
-  await expect(mainRow, `No matching main row found for ID: ${searchText}`).toHaveCount(1);
+      // 4️⃣ If still no match → FAIL EARLY with meaningful message
+      await expect(mainRow, `No matching main row found for ID: ${searchText}`).toHaveCount(1);
 
-  // 5️⃣ Wait for the row to become visible
-  await mainRow.waitFor({ state: 'visible', timeout: 30000 });
+      // 5️⃣ Wait for the row to become visible
+      await mainRow.waitFor({ state: 'visible', timeout: 30000 });
 
-  // 6️⃣ Validate main status (column #9)
-  const mainStatusText = (await mainRow.locator('td').nth(9).innerText()).trim();
-  expect(mainStatusText).toBe(expectedMainStatus);
+      // 6️⃣ Validate main status (column #9)
+      const mainStatusText = (await mainRow.locator('td').nth(9).innerText()).trim();
+      expect(mainStatusText).toBe(expectedMainStatus);
 
-  // 7️⃣ Expand main row
-  await mainRow.click();
+      // 7️⃣ Expand main row
+      await mainRow.click();
 
-  // 8️⃣ Wait for nested refund row
-  const nestedRow = mainRow.locator('xpath=following-sibling::tr[contains(@class,"nested-row")]').first();
-  await nestedRow.waitFor({ state: 'visible', timeout: 30000 });
+      // 8️⃣ Wait for nested refund row
+      const nestedRow = mainRow.locator('xpath=following-sibling::tr[contains(@class,"nested-row")]').first();
+      await nestedRow.waitFor({ state: 'visible', timeout: 30000 });
 
-  // 9️⃣ Validate nested status
-  await expect(nestedRow).toContainText(expectedNestedStatus);
-}
-
+      // 9️⃣ Validate nested status
+      await expect(nestedRow).toContainText(expectedNestedStatus);
+    }
+  // //*********************************************************************************************** */
 
 
 

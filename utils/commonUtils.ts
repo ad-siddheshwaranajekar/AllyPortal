@@ -8,38 +8,49 @@ export class CommonUtils {
   }
 
   private async highlight(locator: Locator) {
-    await locator.scrollIntoViewIfNeeded();
-    const handle = await locator.elementHandle();
-    if (!handle) return;
+    try {
+      // Check locator is attached to an active page
+      const attached = await locator.isVisible({ timeout: 3000 }).catch(() => false);
+      if (!attached) return;
 
-    await this.page.evaluate((el) => {
-      const orig = el.getAttribute("style") || "";
-      el.style.transition = "box-shadow 0.95s ease";
-      el.style.boxShadow = "0 0 15px 5px rgba(231, 12, 23, 0.9)";
+      const handle = await locator.elementHandle();
+      if (!handle) return;
 
-      setTimeout(() => {
-        el.style.boxShadow = "none";
-        el.setAttribute("style", orig);
-      }, 1000);
-    }, handle);
+      await this.page.evaluate((el) => {
+        const orig = el.getAttribute("style") || "";
+        el.style.transition = "box-shadow 0.95s ease";
+        el.style.boxShadow = "0 0 15px 5px rgba(231, 12, 23, 0.9)";
+
+        setTimeout(() => {
+          el.style.boxShadow = "none";
+          el.setAttribute("style", orig);
+        }, 1000);
+      }, handle);
+
+    } catch (err) {
+      console.warn("⚠ highlight skipped: page/locator was not ready");
+    }
   }
 
   async click(locator: Locator) {
+    await locator.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
     await this.highlight(locator);
-    await locator.click();
+    await locator.click({ timeout: 15000 });
+    // avoid long sleeps unless needed
   }
 
   async fill(locator: Locator, text: string) {
+    await locator.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
     await this.highlight(locator);
     await locator.fill(text);
   }
 
   async type(locator: Locator, text: string) {
+    await locator.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
     await this.highlight(locator);
     await locator.type(text);
   }
 
-  
   async waitForElementVisible(locator: Locator, timeout = 10000) {
     await locator.waitFor({ state: 'visible', timeout });
   }
@@ -49,6 +60,7 @@ export class CommonUtils {
   }
 
   async getText(locator: Locator): Promise<string> {
-    return (await locator.textContent()) ?? '';
+    const text = await locator.textContent().catch(() => "");
+    return text ?? '';
   }
 }
