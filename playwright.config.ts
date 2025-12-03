@@ -67,7 +67,7 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'Allly_chromium',
+      name: 'Ally_chromium',
       use: {
         ...devices['Desktop Chrome'],
         viewport: null,

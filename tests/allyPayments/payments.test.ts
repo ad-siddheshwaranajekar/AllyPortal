@@ -74,7 +74,7 @@ import refundData from '../../testData/refundData.json';
   await paymentsPage.validatePaymentsPageLoaded();
   await paymentsPage.validateItemsPerPageOptions();   
  });
-  test('Validate teh invalid search shows no results @regression', async ({page}) => {
+  test('Validate the invalid search shows no results @regression', async ({page}) => {
 
     await paymentsPage.validatePaymentsPageLoaded();
     // Ensure search input is visible then perform invalid search
@@ -113,21 +113,7 @@ import refundData from '../../testData/refundData.json';
  
   
   
-  // test.only("Validate that the Ally is able to see all refund transactions associated with the original transaction ID @regression", async ({ page }) => {
-  // const searchText = refundData[0].searchText;
-  // const expectedMainStatus = "Refunded";
-  // const expectedNestedStatus = "Refund Settled";
-
-  // await paymentsPage.searchTransaction(searchText);
-
-  // await paymentsPage.validateRefundFlow(
-  //   searchText,
-  //   expectedMainStatus,
-  //   expectedNestedStatus
-  // );
-  //   });
-
-  //await paymentsPage.validateSearchResultStatus(searchResult);
+   //await paymentsPage.validateSearchResultStatus(searchResult);
  test('Validate that the Ally is able to see all refund transactions associated with the original transaction ID @regression', async ({ page }) => {
     const Tid = 'c39140e1-fc9c-4177-8b60-4b0332a79348';
 

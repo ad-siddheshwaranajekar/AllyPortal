@@ -7,7 +7,7 @@ import { de } from '@faker-js/faker';
 test.describe('Payment Widget Tests', () => {
   
 
-test('Verify Create Payment Token → Open Payment Widget for ACH', async ({ page }) => {
+test.only('Verify Create Payment Token → Open Payment Widget for ACH', async ({ page }) => {
 
   const apiContext = await request.newContext({
     baseURL: paymentTestData.baseURL,
@@ -46,7 +46,7 @@ test('Verify Create Payment Token → Open Payment Widget for ACH', async ({ pag
   routingNumber: '124003116',
   accountNumber: '123456789'
 });
-await page.waitForTimeout(1000);
+await page.waitForTimeout(2000);
 await paymentWidgetPage.submitPayment();
 await page.waitForTimeout(5000);
 await expect(paymentWidgetPage.sueccessMessage).toHaveText('Thank you for your payment!');    
@@ -90,14 +90,14 @@ test('Verify Create Payment Token → Open Payment Widget for CC', async ({ page
 
   await expect(page).toHaveTitle(/AndDone JS/);
   await paymentWidgetPage.selectCard();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
   await paymentWidgetPage.fillCCardDetails({
     nameOnCard: 'Siddheshwar QAT',
     cardNumber: '370000000000002',
     expiry: '0330',
     cvv: '7373'
   });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
   await paymentWidgetPage.billingAddress({
     address: '123 Main St',
     suite: 'Apt 1',
