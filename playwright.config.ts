@@ -54,7 +54,7 @@ export default defineConfig({
   // ],
   reporter: [
   ["ortoni-report", reportConfig],
-  //['html', { outputFolder: 'playwright-report', open: 'never' }]
+  ['html', { outputFolder: 'playwright-report', open: 'never' }]
 ],
 
   use: {
