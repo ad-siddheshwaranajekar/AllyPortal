@@ -35,7 +35,7 @@ jobs:
       if: ${{ always() }}
       with:
         name: ortoni-report
-        path: test-results/my-report/
+        path: my-report/
         retention-days: 30
 
     # ----------------------------------------------------
