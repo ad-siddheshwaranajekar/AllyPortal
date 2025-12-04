@@ -27,31 +27,21 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
 
-    # -----------------------------------------
-    # Upload core report folders
-    # -----------------------------------------
-
-    # - name: Upload Playwright HTML Report
-    #   uses: actions/upload-artifact@v4
-    #   if: ${{ always() }}
-    #   with:
-    #     name: playwright-html-report
-    #     path: playwright-report/
-    #     retention-days: 30
-
+    # ----------------------------------------------------
+    # Upload Ortoni report
+    # ----------------------------------------------------
     - name: Upload Ortoni Report
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
         name: ortoni-report
-        path: my-report/
+        path: test-results/my-report/
         retention-days: 30
 
-    # -----------------------------------------
-    # REQUIRED IF base64Image = false
-    # (Otherwise screenshot links break)
-    # -----------------------------------------
-    - name: Upload Playwright Test Results (screenshots/videos/traces)
+    # ----------------------------------------------------
+    # Upload Playwright test artifacts (screenshots, videos, traces)
+    # ----------------------------------------------------
+    - name: Upload Playwright Test Results
       uses: actions/upload-artifact@v4
       if: ${{ always() }}
       with:
