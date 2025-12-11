@@ -49,11 +49,14 @@ this.itemsPerPageOptions = page.locator('#maxPerPage option');
   }
 
   // Navigate to a URL
-  async navigateTo(url: string) {
-    console.log('Navigating to:', url);
-    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
-  }
+  // async navigateTo(url: string) {
+  //   console.log('Navigating to:', url);
+  //   await this.page.goto(url, { waitUntil: 'domcontentloaded' });
+  // }
 
+ async navigate() {
+  await this.page.goto('/');
+}
 
 //Items per page selection
   async selectItemsPerPage(count: number) {

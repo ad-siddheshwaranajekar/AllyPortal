@@ -4,11 +4,15 @@ import { ENV, EnvironmentKey } from './tests/config/env';
 
 import { OrtoniReportConfig } from 'ortoni-report';
 
-// 🔵 Debug environment selection (shows in GitHub Actions logs)
-console.log("🔵 Playwright CONFIG TEST_ENV:", process.env.TEST_ENV);
-console.log("🔵 Playwright CONFIG baseURL:", ENV[process.env.TEST_ENV as EnvironmentKey] || ENV.QAT);
+// // 🔵 Debug environment selection (shows in GitHub Actions logs)
+// console.log("🔵 Playwright CONFIG TEST_ENV:", process.env.TEST_ENV);
+// console.log("🔵 Playwright CONFIG baseURL:", ENV[process.env.TEST_ENV as EnvironmentKey] || ENV.QAT);
 
-
+if (!process.env._CONFIG_LOGGED) {
+  console.log("🔵 Playwright CONFIG TEST_ENV:", process.env.TEST_ENV);
+  console.log("🔵 Playwright CONFIG baseURL:", ENV[process.env.TEST_ENV as EnvironmentKey] || ENV.QAT);
+  process.env._CONFIG_LOGGED = "true";
+}
 
 const reportConfig: OrtoniReportConfig = {
   open: process.env.CI ? 'never' : 'always',
