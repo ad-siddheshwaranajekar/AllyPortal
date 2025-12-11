@@ -33,30 +33,38 @@ export default defineConfig({
   outputDir: 'test-results',
 
   use: {
-    baseURL: process.env.TEST_ENV ? ENV[process.env.TEST_ENV as keyof typeof ENV] : ENV.QAT,
+    baseURL: process.env.TEST_ENV
+      ? ENV[process.env.TEST_ENV as keyof typeof ENV]
+      : ENV.QAT,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    viewport: null,
+    viewport: null, // full-screen desktop
   },
 
-  reporter: [['ortoni-report', reportConfig]],
+  // ✅ Multiple reporters: Ortoni + HTML
+  reporter: [
+   //['ortoni-report', reportConfig],
+    ['html', { outputFolder: 'playwright-report', open: 'always' }]
+  ],
 
   projects: [
     {
       name: 'Desktop Chrome',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: null,
+        viewport: null,  // full screen
+          deviceScaleFactor: undefined,
         launchOptions: { args: ['--start-maximized'] },
       },
     },
+    // Uncomment these if you want mobile tests
     // {
-    //   name: 'iPhone 13',
+    //   name: 'Mobile Safari',
     //   use: devices['iPhone 13'],
     // },
     // {
-    //   name: 'Pixel 5',
+    //   name: 'Pixel 5 Android',
     //   use: devices['Pixel 5'],
     // },
   ],
