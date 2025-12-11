@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { WebhookPage } from '../../pages/webhook/webhookPage';
-import { CURRENT_ENV } from '../../tests/config/env';
+import { CURRENT_ENV, EnvironmentKey } from '../../tests/config/env';
 import { CommonUtils } from '../../utils/commonUtils';
 import { SideMenuPage } from '../../pages/SideMenuPage';
 import { LoginPage } from '../../pages/login/loginPage';
