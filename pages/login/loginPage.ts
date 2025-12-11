@@ -1,5 +1,6 @@
 import { Page, Locator } from "@playwright/test";
 import { BasePage } from "../basePage";
+import { ENV, EnvironmentKey } from "../../tests/config/env";
 import loginData from '../../testData/loginData.json';
 
 
