@@ -44,8 +44,8 @@ export default defineConfig({
 
   // ✅ Multiple reporters: Ortoni + HTML
   reporter: [
-   //['ortoni-report', reportConfig],
-    ['html', { outputFolder: 'playwright-report', open: 'always' }]
+   ['ortoni-report', reportConfig],
+  //  ['html', { outputFolder: 'playwright-report', open: 'always' }]
   ],
 
   projects: [
