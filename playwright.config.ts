@@ -1,7 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as os from 'os';
-import { ENV } from './tests/config/env';
+import { ENV, CURRENT_ENV } from './tests/config/env';
 import { OrtoniReportConfig } from 'ortoni-report';
+
+// 🔵 Debug environment selection (shows in GitHub Actions logs)
+console.log("🔵 TEST_ENV =", process.env.TEST_ENV);
+console.log("🔵 CURRENT_ENV URL =", CURRENT_ENV);
 
 const reportConfig: OrtoniReportConfig = {
   open: process.env.CI ? 'never' : 'always',
@@ -33,18 +37,16 @@ export default defineConfig({
   outputDir: 'test-results',
 
   use: {
-    baseURL: process.env.TEST_ENV
-      ? ENV[process.env.TEST_ENV as keyof typeof ENV]
-      : ENV.QAT,
+    baseURL: CURRENT_ENV,   // ✅ Correct env always used
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    viewport: null,  // Full-screen on local + CI
+    viewport: null,         // ✅ fixes full-screen desktop
   },
 
   reporter: [
     ['ortoni-report', reportConfig],
-    // ['html', { outputFolder: 'playwright-report', open: 'always' }]
+    // ['html', { outputFolder: 'playwright-report', open: 'never' }]
   ],
 
   projects: [
@@ -52,21 +54,10 @@ export default defineConfig({
       name: 'Desktop Chrome',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: null,               // required for full-screen
-        deviceScaleFactor: undefined, // FIX: required for GitHub Actions
-        launchOptions: {
-          args: ['--start-maximized'],
-        },
+        viewport: null,               // ✅ full screen
+        deviceScaleFactor: undefined, // ✅ prevents CI error
+        launchOptions: { args: ['--start-maximized'] },
       },
     },
-    // --- Optional mobile projects ---
-    // {
-    //   name: 'Mobile Safari',
-    //   use: devices['iPhone 13'],
-    // },
-    // {
-    //   name: 'Pixel 5 Android',
-    //   use: devices['Pixel 5'],
-    // },
   ],
 });

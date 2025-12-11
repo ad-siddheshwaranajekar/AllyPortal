@@ -9,6 +9,7 @@ on:
         default: "QAT"
         type: choice
         options:
+          - DEV
           - QAT
           - UAT
 
@@ -16,46 +17,58 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    # --------------------------------------------------------
+    # Define all secrets statically → avoids VS Code warnings
+    # --------------------------------------------------------
+    env:
+      USERNAME_DEV: ${{ secrets.LOGIN_USERNAME_DEV }}
+      PASSWORD_DEV: ${{ secrets.LOGIN_PASSWORD_DEV }}
+      USERNAME_QAT: ${{ secrets.LOGIN_USERNAME_QAT }}
+      PASSWORD_QAT: ${{ secrets.LOGIN_PASSWORD_QAT }}
+      USERNAME_UAT: ${{ secrets.LOGIN_USERNAME_UAT }}
+      PASSWORD_UAT: ${{ secrets.LOGIN_PASSWORD_UAT }}
+      TEST_ENV: ${{ github.event.inputs.env }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npx playwright install --with-deps
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      # -----------------------------
-      # Set ENV-specific secrets safely
-      # -----------------------------
-      - name: Set secrets for QAT
-        if: ${{ github.event.inputs.env == 'QAT' }}
+      # ------------------------------------------------------------
+      # Set ENV-specific USERNAME/PASSWORD safely using case
+      # ------------------------------------------------------------
+      - name: Set ENV specific USERNAME/PASSWORD
         run: |
-          echo "USERNAME=${{ secrets.LOGIN_USERNAME_QAT }}" >> $GITHUB_ENV
-          echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_QAT }}" >> $GITHUB_ENV
-
-      - name: Set secrets for UAT
-        if: ${{ github.event.inputs.env == 'UAT' }}
-        run: |
-          echo "USERNAME=${{ secrets.LOGIN_USERNAME_UAT }}" >> $GITHUB_ENV
-          echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_UAT }}" >> $GITHUB_ENV
+          echo "Selected environment: $TEST_ENV"
+          case "$TEST_ENV" in
+            DEV)
+              echo "USERNAME=${USERNAME_DEV}" >> $GITHUB_ENV
+              echo "PASSWORD=${PASSWORD_DEV}" >> $GITHUB_ENV
+              ;;
+            QAT)
+              echo "USERNAME=${USERNAME_QAT}" >> $GITHUB_ENV
+              echo "PASSWORD=${PASSWORD_QAT}" >> $GITHUB_ENV
+              ;;
+            UAT)
+              echo "USERNAME=${USERNAME_UAT}" >> $GITHUB_ENV
+              echo "PASSWORD=${PASSWORD_UAT}" >> $GITHUB_ENV
+              ;;
+          esac
 
       # -----------------------------
       # Run Playwright Tests
       # -----------------------------
       - name: Run Playwright Tests
         env:
-          ENV: ${{ github.event.inputs.env }}
+          TEST_ENV: ${{ github.event.inputs.env }}
           USERNAME: ${{ env.USERNAME }}
           PASSWORD: ${{ env.PASSWORD }}
         run: |
-          echo "Running Playwright tests on environment: $ENV"
+          echo "Running Playwright tests on environment: $TEST_ENV"
           npx playwright test
 
       # -----------------------------
