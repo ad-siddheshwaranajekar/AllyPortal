@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/login/loginPage';
 import  loginData  from '../../testData/loginData.json';  
 
-test.describe('Login Module', () => {
+test.describe.only('Login Module', () => {
  
   test('Login with valid credentials @smoke @regression', async ({ page }) => {
   //test.setTimeout(70000); 
