@@ -1,11 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as os from 'os';
-import { ENV, CURRENT_ENV } from './tests/config/env';
+import { ENV } from './tests/config/env';
 import { OrtoniReportConfig } from 'ortoni-report';
 
 // 🔵 Debug environment selection (shows in GitHub Actions logs)
 console.log("🔵 TEST_ENV =", process.env.TEST_ENV);
-console.log("🔵 CURRENT_ENV URL =", CURRENT_ENV);
+
 
 const reportConfig: OrtoniReportConfig = {
   open: process.env.CI ? 'never' : 'always',
@@ -37,7 +37,7 @@ export default defineConfig({
   outputDir: 'test-results',
 
   use: {
-    baseURL: CURRENT_ENV,   // ✅ Correct env always used
+      baseURL: ENV[(process.env.TEST_ENV as keyof typeof ENV) || "QAT"],
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
