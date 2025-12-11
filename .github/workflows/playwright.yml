@@ -17,9 +17,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # --------------------------------------------------------
-    # Define all secrets statically → avoids VS Code warnings
-    # --------------------------------------------------------
+    # All secrets defined globally
     env:
       USERNAME_DEV: ${{ secrets.LOGIN_USERNAME_DEV }}
       PASSWORD_DEV: ${{ secrets.LOGIN_PASSWORD_DEV }}
@@ -27,7 +25,6 @@ jobs:
       PASSWORD_QAT: ${{ secrets.LOGIN_PASSWORD_QAT }}
       USERNAME_UAT: ${{ secrets.LOGIN_USERNAME_UAT }}
       PASSWORD_UAT: ${{ secrets.LOGIN_PASSWORD_UAT }}
-      TEST_ENV: ${{ github.event.inputs.env }}
 
     steps:
       - uses: actions/checkout@v3
@@ -38,10 +35,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps
 
-      # ------------------------------------------------------------
-      # Set ENV-specific USERNAME/PASSWORD safely using case
-      # ------------------------------------------------------------
+      # Map username/password based on selected environment
       - name: Set ENV specific USERNAME/PASSWORD
+        env:
+          TEST_ENV: ${{ github.event.inputs.env }}
         run: |
           echo "Selected environment: $TEST_ENV"
           case "$TEST_ENV" in
@@ -59,9 +56,6 @@ jobs:
               ;;
           esac
 
-      # -----------------------------
-      # Run Playwright Tests
-      # -----------------------------
       - name: Run Playwright Tests
         env:
           TEST_ENV: ${{ github.event.inputs.env }}
@@ -71,24 +65,16 @@ jobs:
           echo "Running Playwright tests on environment: $TEST_ENV"
           npx playwright test
 
-      # -----------------------------
-      # Upload Ortoni Report
-      # -----------------------------
       - name: Upload Ortoni Report
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: always()
         with:
           name: ortoni-report
           path: my-report/
-          retention-days: 30
 
-      # -----------------------------
-      # Upload Playwright Test Artifacts
-      # -----------------------------
       - name: Upload Playwright Test Results
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: always()
         with:
           name: playwright-artifacts
           path: test-results/
-          retention-days: 31

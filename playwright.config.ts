@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as os from 'os';
-import { ENV } from './tests/config/env';
+import { ENV, EnvironmentKey } from './tests/config/env';
+
 import { OrtoniReportConfig } from 'ortoni-report';
 
 // 🔵 Debug environment selection (shows in GitHub Actions logs)
-console.log("🔵 TEST_ENV =", process.env.TEST_ENV);
+console.log("🔵 Playwright CONFIG TEST_ENV:", process.env.TEST_ENV);
+console.log("🔵 Playwright CONFIG baseURL:", ENV[process.env.TEST_ENV as EnvironmentKey] || ENV.QAT);
+
 
 
 const reportConfig: OrtoniReportConfig = {
