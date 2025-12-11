@@ -26,13 +26,14 @@ const reportConfig: OrtoniReportConfig = {
   base64Image: false,
   logo: './assets/AllyLogoDark.svg',
   stdIO: true,
-  meta: {
-    'Test Cycle': 'AN_ALMGMT_V12',
-    Environment: process.env.TEST_ENV || 'Local',
-    version: '1',
-    release: 'V12',
-    platform: os.type(),
-  },
+  meta: (() => ({
+  'Test Cycle': 'AN_ALMGMT_V12',
+  Environment: process.env.TEST_ENV,
+  version: '1',
+  release: 'V12',
+  platform: os.type(),
+}))(),
+
 } as any;
 
 export default defineConfig({
