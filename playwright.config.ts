@@ -1,8 +1,7 @@
-// playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
-import { OrtoniReportConfig } from 'ortoni-report';
 import * as os from 'os';
-import { CURRENT_ENV } from './tests/config/env';
+import { ENV } from './tests/config/env';
+import { OrtoniReportConfig } from 'ortoni-report';
 
 const reportConfig: OrtoniReportConfig = {
   open: process.env.CI ? 'never' : 'always',
@@ -23,7 +22,7 @@ const reportConfig: OrtoniReportConfig = {
     release: 'V12',
     platform: os.type(),
   },
-} as any; // bypass TypeScript for custom properties
+} as any;
 
 export default defineConfig({
   testDir: './tests',
@@ -34,38 +33,31 @@ export default defineConfig({
   outputDir: 'test-results',
 
   use: {
-    baseURL: CURRENT_ENV,
+    baseURL: process.env.TEST_ENV ? ENV[process.env.TEST_ENV as keyof typeof ENV] : ENV.QAT,
     trace: 'on-first-retry',
-    viewport: null,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    viewport: null,
   },
 
-  reporter: [
-    ['ortoni-report', reportConfig],
-    // You can add HTML reporter if needed:
-    // ['html', { outputFolder: 'playwright-report', open: 'never' }]
-  ],
+  reporter: [['ortoni-report', reportConfig]],
 
   projects: [
     {
-      name: 'Ally_chromium',
+      name: 'Desktop Chrome',
       use: {
         ...devices['Desktop Chrome'],
         viewport: null,
-        deviceScaleFactor: undefined,
-        launchOptions: {
-          args: ['--start-maximized'],
-        },
+        launchOptions: { args: ['--start-maximized'] },
       },
     },
     // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 13'] },
+    //   name: 'iPhone 13',
+    //   use: devices['iPhone 13'],
     // },
     // {
-    //   name: 'Pixel 5 Android',
-    //   use: { ...devices['Pixel 5'] },
+    //   name: 'Pixel 5',
+    //   use: devices['Pixel 5'],
     // },
   ],
 });

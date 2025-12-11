@@ -15,45 +15,52 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # Install Playwright browsers
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # Set environment-specific secrets
-      - name: Set environment secrets
+      # -----------------------------
+      # Set ENV-specific secrets safely
+      # -----------------------------
+      - name: Set secrets for QAT
+        if: ${{ github.event.inputs.env == 'QAT' }}
         run: |
-          if [ "${{ github.event.inputs.env }}" = "QAT" ]; then
-            echo "USERNAME=${{ secrets.LOGIN_USERNAME_QAT }}" >> $GITHUB_ENV
-            echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_QAT }}" >> $GITHUB_ENV
-          elif [ "${{ github.event.inputs.env }}" = "UAT" ]; then
-            echo "USERNAME=${{ secrets.LOGIN_USERNAME_UAT }}" >> $GITHUB_ENV
-            echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_UAT }}" >> $GITHUB_ENV
-          fi
+          echo "USERNAME=${{ secrets.LOGIN_USERNAME_QAT }}" >> $GITHUB_ENV
+          echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_QAT }}" >> $GITHUB_ENV
 
-      # Run Playwright tests
+      - name: Set secrets for UAT
+        if: ${{ github.event.inputs.env == 'UAT' }}
+        run: |
+          echo "USERNAME=${{ secrets.LOGIN_USERNAME_UAT }}" >> $GITHUB_ENV
+          echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_UAT }}" >> $GITHUB_ENV
+
+      # -----------------------------
+      # Run Playwright Tests
+      # -----------------------------
       - name: Run Playwright Tests
+        env:
+          ENV: ${{ github.event.inputs.env }}
+          USERNAME: ${{ env.USERNAME }}
+          PASSWORD: ${{ env.PASSWORD }}
         run: |
-          echo "Running Playwright tests on environment: ${{ github.event.inputs.env }}"
-          npx playwright test --project=Ally_chromium
+          echo "Running Playwright tests on environment: $ENV"
+          npx playwright test
 
-      # Upload Ortoni report
+      # -----------------------------
+      # Upload Ortoni Report
+      # -----------------------------
       - name: Upload Ortoni Report
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -62,7 +69,9 @@ jobs:
           path: my-report/
           retention-days: 30
 
-      # Upload Playwright artifacts (screenshots, videos, traces)
+      # -----------------------------
+      # Upload Playwright Test Artifacts
+      # -----------------------------
       - name: Upload Playwright Test Results
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
