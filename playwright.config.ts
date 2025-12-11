@@ -77,7 +77,16 @@ export default defineConfig({
         },
       },
     },
-
+    {
+      name: 'Mobile Safari',
+      use: {
+        ...devices['iPhone 13'],
+      },
+    },
+  {
+      name: 'Pixel 5 Android', // Changed name for clarity
+      use: { ...devices['Pixel 5'], }, // Using Pixel 5 settings
+    }
     // Edge project kept commented as you had it
     // {
     //   name: 'Microsoft Edge',
