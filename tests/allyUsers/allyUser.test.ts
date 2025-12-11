@@ -93,9 +93,9 @@ test('Validate that an Ally can successfully deactivat an actective Ally users a
   await users.deactivateFirstActiveUser();
 
 });
-test.only('sort Users table by Email', async ({ page }) => {
-  await sortColumn(page, SortColumns.Users.Email);
-});
+// test.only('sort Users table by Email', async ({ page }) => {
+//   await sortColumn(page, SortColumns.Users.Email);
+// });
 
 //test
 }); 

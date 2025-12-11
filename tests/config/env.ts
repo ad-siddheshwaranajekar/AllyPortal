@@ -2,7 +2,8 @@
 
 export const ENV = {
   QAT: 'https://ally.qat.anddone.com/#/login',
-  UAT: 'https://ally.uat.anddone.com/#/login'
+  UAT: 'https://ally.uat.anddone.com/#/login',
 };
 
+// Export the currently selected environment URL
 export const CURRENT_ENV = process.env.TEST_ENV || ENV.QAT;
