@@ -39,13 +39,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    viewport: null, // full-screen desktop
+    viewport: null,  // Full-screen on local + CI
   },
 
-  // ✅ Multiple reporters: Ortoni + HTML
   reporter: [
-   ['ortoni-report', reportConfig],
-  //  ['html', { outputFolder: 'playwright-report', open: 'always' }]
+    ['ortoni-report', reportConfig],
+    // ['html', { outputFolder: 'playwright-report', open: 'always' }]
   ],
 
   projects: [
@@ -53,12 +52,14 @@ export default defineConfig({
       name: 'Desktop Chrome',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: null,  // full screen
-          deviceScaleFactor: undefined,
-        launchOptions: { args: ['--start-maximized'] },
+        viewport: null,               // required for full-screen
+        deviceScaleFactor: undefined, // FIX: required for GitHub Actions
+        launchOptions: {
+          args: ['--start-maximized'],
+        },
       },
     },
-    // Uncomment these if you want mobile tests
+    // --- Optional mobile projects ---
     // {
     //   name: 'Mobile Safari',
     //   use: devices['iPhone 13'],
