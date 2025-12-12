@@ -4,21 +4,18 @@ import { LoginPage } from '../../pages/login/loginPage';
 import { SideMenuPage } from '../../pages/SideMenuPage';
 import { CommonUtils } from '../../utils/commonUtils';
 import { UsersPage } from '../../pages/users/usersPage';
-import { SortColumns } from '../../utils/tableUtils/sortColumns';
 
 test.describe('Users - Search/Filter/Table', () => {
   let loginPage: LoginPage;
   let sideMenuPage: SideMenuPage;
   let usersPage: UsersPage;
   let commonUtils: CommonUtils; 
- 
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     sideMenuPage = new SideMenuPage(page);
     usersPage = new UsersPage(page);
     commonUtils = new CommonUtils(page);
-    
 
     // Login + navigate to Users page
     await loginPage.navigateTo(CURRENT_ENV);
@@ -93,9 +90,7 @@ test('Validate that an Ally can successfully deactivat an actective Ally users a
   await users.deactivateFirstActiveUser();
 
 });
-// test.only('sort Users table by Email', async ({ page }) => {
-//   await sortColumn(page, SortColumns.Users.Email);
-// });
+
 
 //test
 }); 

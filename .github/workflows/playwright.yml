@@ -1,77 +1,105 @@
-name: Playwright Tests
+name: Playwright Tests (Enterprise)
 
 on:
+  push:
+    branches: [ main, master ]
   workflow_dispatch:
-    inputs:
-      env:
-        description: "Select Environment"
-        required: true
-        default: "QAT"
-        type: choice
-        options:
-          - DEV
-          - QAT
-          - UAT
+
+env:
+  AWS_REGION: us-east-1
+  REPORT_BUCKET: automation-reports-test1
+  REPORT_PATH: AllyReports/AllyUIReports
 
 jobs:
+# --------------------------------------
+# 1. SETUP
+# --------------------------------------
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      REPORT_BUCKET: ${{ steps.export.outputs.REPORT_BUCKET }}
+      DATETIME: ${{ steps.set-datetime.outputs.DATETIME }}
+      MINI_DATETIME: ${{ steps.set-datetime.outputs.MINI_DATETIME }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # Cache node_modules
+      - name: Cache Node
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      # Cache Playwright browsers
+      - name: Cache Playwright
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Set timestamp
+        id: set-datetime
+        run: |
+          export TZ="Asia/Kolkata"
+          DATETIME=$(date +"%A_%d_%B_%Y_v%H")
+          MINI_DATETIME=$(date +"%A_%d_%B_%Y")
+
+          echo "DATETIME=$DATETIME" >> $GITHUB_ENV
+          echo "MINI_DATETIME=$MINI_DATETIME" >> $GITHUB_ENV
+
+          echo "DATETIME=$DATETIME" >> $GITHUB_OUTPUT
+          echo "MINI_DATETIME=$MINI_DATETIME" >> $GITHUB_OUTPUT
+      - name: Export REPORT_BUCKET for downstream jobs
+        id: export
+        run: echo "REPORT_BUCKET=${REPORT_BUCKET}" >> $GITHUB_OUTPUT
+        env:
+          REPORT_BUCKET: ${{ env.REPORT_BUCKET }}
+# --------------------------------------
+# 2. TEST EXECUTION
+# --------------------------------------
   test:
+    needs: setup
+    timeout-minutes: 60
     runs-on: ubuntu-latest
 
-    # Define all secrets globally
-    env:
-      USERNAME_DEV: ${{ secrets.LOGIN_USERNAME_DEV }}
-      PASSWORD_DEV: ${{ secrets.LOGIN_PASSWORD_DEV }}
-      USERNAME_QAT: ${{ secrets.LOGIN_USERNAME_QAT }}
-      PASSWORD_QAT: ${{ secrets.LOGIN_PASSWORD_QAT }}
-      USERNAME_UAT: ${{ secrets.LOGIN_USERNAME_UAT }}
-      PASSWORD_UAT: ${{ secrets.LOGIN_PASSWORD_UAT }}
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: lts/*
 
-      - name: Clean previous reports
-        run: |
-          rm -rf my-report/
-          rm -rf playwright-report/
-          rm -rf test-results/
+      - name: Restore Node cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
 
-      - run: npm ci
-      - run: npx playwright install --with-deps
+      - name: Restore Playwright cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
 
-      # Map username/password based on selected environment
-      - name: Set ENV specific USERNAME/PASSWORD
-        env:
-          TEST_ENV: ${{ github.event.inputs.env }}
-        run: |
-          echo "Selected environment: $TEST_ENV"
-          case "$TEST_ENV" in
-            DEV)
-              echo "USERNAME=${USERNAME_DEV}" >> $GITHUB_ENV
-              echo "PASSWORD=${PASSWORD_DEV}" >> $GITHUB_ENV
-              ;;
-            QAT)
-              echo "USERNAME=${USERNAME_QAT}" >> $GITHUB_ENV
-              echo "PASSWORD=${PASSWORD_QAT}" >> $GITHUB_ENV
-              ;;
-            UAT)
-              echo "USERNAME=${USERNAME_UAT}" >> $GITHUB_ENV
-              echo "PASSWORD=${PASSWORD_UAT}" >> $GITHUB_ENV
-              ;;
-          esac
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Run Playwright Tests
-        env:
-          TEST_ENV: ${{ github.event.inputs.env }}
-          USERNAME: ${{ env.USERNAME }}
-          PASSWORD: ${{ env.PASSWORD }}
-        run: |
-          echo "Running Playwright tests on environment: $TEST_ENV"
-          npx playwright test
+      - name: Run Playwright tests
+        run: npx playwright test
 
-      # Upload Ortoni report
       - name: Upload Ortoni Report
         uses: actions/upload-artifact@v4
         if: always()
@@ -80,21 +108,64 @@ jobs:
           path: my-report/
           retention-days: 30
 
-      # Upload Playwright HTML report
-      - name: Generate and Upload Playwright HTML Report
-        run: npx playwright show-report playwright-report || true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-html-report
-          path: playwright-report/
-          retention-days: 30
-
-      # Upload Playwright test artifacts (screenshots, videos, traces)
-      - name: Upload Playwright Test Results
+      - name: Upload Playwright Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-artifacts
           path: test-results/
-          retention-days: 31
+          retention-days: 30
+
+# --------------------------------------
+# 3. REPORT PUBLISH TO S3
+# --------------------------------------
+  publish:
+    name: Publish Reports to S3
+    needs: [setup, test]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download report artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ortoni-report
+          path: my-report/
+      
+      # - name: Move image file into report folder
+      #   run: |
+      #     cp my-report/assets/AllyLogoDark.svg my-report/
+
+      - name: Upload reports to S3
+        run: |
+          echo "Reports for: ${{ needs.setup.outputs.MINI_DATETIME }}"
+          ls -la && echo "--------------------" && file * && echo "--------------------" && ls -R
+          aws s3 cp my-report/ \
+            s3://${{ env.REPORT_BUCKET }}/${{ env.REPORT_PATH }}/${{ needs.setup.outputs.MINI_DATETIME }}/ \
+            --recursive
+
+# --------------------------------------
+# 4. SLACK NOTIFICATION
+# --------------------------------------
+  notify:
+    name: Slack Notification
+    needs: [setup, publish]
+    if: always()
+    uses: ./.github/workflows/slack.yml
+
+    with:
+      bucket_name: ${{ needs.setup.outputs.REPORT_BUCKET }}
+      # report_path: ${ env.REPORT_PATH }
+      folder_name: ${{ needs.setup.outputs.MINI_DATETIME }}
+      repository_name: ${{ github.repository }}
+      # status: ${{ needs.publish.result }}
+
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
