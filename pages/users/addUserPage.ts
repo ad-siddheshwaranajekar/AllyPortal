@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { BasePage } from "../basePage";
-import { CURRENT_ENV } from "../../tests/config/env";   
+  
 
 export class AddUserPage extends BasePage {
 
@@ -10,7 +10,7 @@ export class AddUserPage extends BasePage {
     readonly url: string;
     constructor(page: Page) {
         super(page);
-        this.url = `${CURRENT_ENV}/users/add`;
+       this.url = '/#/ally/users';
     }
 
     
@@ -43,6 +43,8 @@ readonly firstRow = this.tableRows.first();
 // Ellipsis inside first row
 readonly firstRowEllipsis = this.firstRow.locator('span.material-symbols-outlined');
 
-
+ async navigate() {
+    await this.page.goto(this.url);
+      }
 
 }

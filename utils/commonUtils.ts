@@ -7,60 +7,67 @@ export class CommonUtils {
     this.page = page;
   }
 
+  // ======================
+  // ENV VARIABLES (STATIC)
+  // ======================
+  static getEnvVariable(name: string): string {
+    const value = process.env[name];
+    if (!value) {
+      throw new Error(`❌ Environment variable "${name}" is not defined`);
+    }
+    return value;
+  }
+
+  // ======================
+  // UI HELPERS
+  // ======================
   private async highlight(locator: Locator) {
     try {
-      // Check locator is attached to an active page
-      const attached = await locator.isVisible({ timeout: 3000 }).catch(() => false);
-      if (!attached) return;
+      const visible = await locator.isVisible({ timeout: 2000 }).catch(() => false);
+      if (!visible) return;
 
       const handle = await locator.elementHandle();
       if (!handle) return;
 
       await this.page.evaluate((el) => {
-        const orig = el.getAttribute("style") || "";
-        el.style.transition = "box-shadow 0.95s ease";
-        el.style.boxShadow = "0 0 15px 5px rgba(231, 12, 23, 0.9)";
+        const original = el.getAttribute('style') || '';
+        el.style.transition = 'box-shadow 0.5s ease';
+        el.style.boxShadow = '0 0 15px 5px rgba(231, 12, 23, 0.9)';
 
         setTimeout(() => {
-          el.style.boxShadow = "none";
-          el.setAttribute("style", orig);
-        }, 1000);
+          el.style.boxShadow = 'none';
+          el.setAttribute('style', original);
+        }, 800);
       }, handle);
 
-    } catch (err) {
-      console.warn("⚠ highlight skipped: page/locator was not ready");
+    } catch {
+      console.warn('⚠ Highlight skipped');
     }
   }
 
   async click(locator: Locator) {
-    await locator.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+    await locator.waitFor({ state: 'visible', timeout: 10000 });
     await this.highlight(locator);
-    await locator.click({ timeout: 15000 });
-    // avoid long sleeps unless needed
+    await locator.click();
   }
 
   async fill(locator: Locator, text: string) {
-    await locator.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+    await locator.waitFor({ state: 'visible', timeout: 10000 });
     await this.highlight(locator);
     await locator.fill(text);
   }
 
   async type(locator: Locator, text: string) {
-    await locator.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+    await locator.waitFor({ state: 'visible', timeout: 10000 });
     await this.highlight(locator);
     await locator.type(text);
   }
 
-  async waitForElementVisible(locator: Locator, timeout = 10000) {
+  async waitForVisible(locator: Locator, timeout = 10000) {
     await locator.waitFor({ state: 'visible', timeout });
   }
 
-  async waitForVisible(locator: Locator, timeout?: number) {
-    await locator.waitFor({ state: 'visible', ...(timeout && { timeout }) });
-  }
-
   async getText(locator: Locator): Promise<string> {
-    const text = await locator.textContent().catch(() => "");
-    return text ?? '';
+    return (await locator.textContent()) ?? '';
   }
 }

@@ -1,6 +1,22 @@
 import { defineConfig, devices } from '@playwright/test';
 import { OrtoniReportConfig } from "ortoni-report";
 import * as os from "os";
+
+//
+import dotenv from 'dotenv';
+
+const envName = process.env.ENV || 'qat';
+console.log('👉 Loading ENV:', envName);
+
+dotenv.config({
+  path: `./config/${envName}.env`,
+   override: true,
+});
+
+console.log('👉 USERNAME from env:', process.env.USERNAME);
+console.log('👉 BASE_URL from env:', process.env.BASE_URL);
+
+
 const reportConfig: OrtoniReportConfig = {
   open: process.env.CI ? "never" : "always",
   folderPath: "my-report",
@@ -25,7 +41,7 @@ logo: "./assets/AllyLogoDark.svg",
 
   meta: {
     "Test Cycle": "AN_ALMGMT_V12",
-    Environment: process.env.NODE_ENV || "QAT",
+   // Environment: process.env.NODE_ENV || "QAT",
     "Executed On": new Date().toLocaleString(), 
     version: "1",
     release: "V12",
@@ -38,6 +54,7 @@ logo: "./assets/AllyLogoDark.svg",
 
 
 export default defineConfig({
+  globalSetup: require.resolve('./utils/global-setup'),
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -49,14 +66,16 @@ export default defineConfig({
   //  Existing HTML report + Allure added
   reporter: [
     
-   ["ortoni-report", reportConfig],
-   //['html']   
+ // ["ortoni-report", reportConfig],
+   ['html']   
                     // existing
         
   ],
  
 
   use: {
+    baseURL: process.env.BASE_URL,
+    storageState: 'auth/auth.json',
     trace: 'on-first-retry',
     viewport: null,
     // optional but useful for Allure:
@@ -76,6 +95,19 @@ export default defineConfig({
         },
       },
     },
+
+  //    {
+  //     name: 'Mobile Safari',
+  //     use: {
+  //       ...devices['iPhone 13'],
+  //     },
+  //   }, 
+  // {
+  //   name: 'Mobile Chrome (Pixel 5)',
+  //   use: {
+  //     ...devices['Pixel 5'], // Emulates a Pixel 5 with Chrome
+  //   },
+  // },
 
     // Edge project kept commented as you had it
     // {

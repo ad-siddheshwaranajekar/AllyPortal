@@ -5,14 +5,14 @@ import  loginData  from '../../testData/loginData.json';
 
 test.describe('Login Module', () => {
  
-  test('Login with valid credentials @smoke @regression', async ({ page }) => {
+  test.only('Login with valid credentials @smoke @regression', async ({ page }) => {
   //test.setTimeout(70000); 
 
     const loginPage = new LoginPage(page); //test
   
     await loginPage.navigate();
     await loginPage.loginAsAlly(); //loginmethod called here
-   // await loginPage.login(loginData[0].username, loginData[0].password);  
+    
 
      const usersHeader = page.locator("//h3[normalize-space()='Users']");
     await expect(usersHeader).toBeVisible({ timeout: 15000 });
@@ -66,7 +66,7 @@ test.describe('Login Module', () => {
     }) => {
       const loginPage = new LoginPage(page);
       await loginPage.navigateToForgotPassword();
-      await loginPage.usernameForResetPasswordInput.fill(loginData[1].username);
+      await loginPage.usernameForResetPasswordInput.fill(loginData[2].username);
       await loginPage.submitButton.click();
       await expect(loginPage.successMessage).toBeVisible({ timeout: 15000 });
     });

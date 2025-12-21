@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { CURRENT_ENV } from '../../tests/config/env';
 import { SideMenuPage } from '../../pages/SideMenuPage';
 import { LoginPage } from '../../pages/login/loginPage';
 import { AddUserPage } from '../../pages/users/addUserPage';
 import { CommonUtils } from '../../utils/commonUtils';
 import { generateUser } from '../../utils/testDataGenerator';
+
 
 // Generate test data
 const user = generateUser();
@@ -16,14 +16,14 @@ test.describe("Add ally users tests", () => {
   let commonUtils: CommonUtils;
 
   test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
+  
     sideMenuPage = new SideMenuPage(page);
     addUserPage = new AddUserPage(page);
     commonUtils = new CommonUtils(page);
 
-    await loginPage.navigateTo(CURRENT_ENV);
-    await loginPage.loginAsAlly();
+   
     await sideMenuPage.openUsers();
+    await addUserPage.page.goto('/#/ally/users');
   });
 
 

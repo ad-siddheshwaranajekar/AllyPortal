@@ -15,5 +15,8 @@
     "@types/node": "^24.10.1",
     "ortoni-report": "^4.0.1"
   },
-  "scripts": {}
+  "scripts": {},
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
 }
