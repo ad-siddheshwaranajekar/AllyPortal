@@ -21,7 +21,7 @@ test.describe('Add ally users tests', () => {
     await page.waitForSelector('div.header', { timeout: 15000 });
   });
 
-  test.only('Verify that an Ally can create a Basic Auth Ally user', async ({ page }) => {
+  test('Verify that an Ally can create a Basic Auth Ally user', async ({ page }) => {
     await addUserPage.AddUserBtn.click();
     await expect(addUserPage.AddUserTxt).toBeVisible({ timeout: 15000 });
 

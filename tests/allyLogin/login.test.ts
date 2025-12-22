@@ -6,7 +6,7 @@ import { on } from 'events';
 
 test.describe('Login Module', () => {
  
-  test('Login with valid credentials @smoke @regression', async ({ page }) => {
+  test.only('Login with valid credentials @smoke @regression', async ({ page }) => {
   //test.setTimeout(70000); 
 
     const loginPage = new LoginPage(page); //test
