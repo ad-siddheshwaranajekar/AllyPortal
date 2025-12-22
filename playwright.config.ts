@@ -57,7 +57,7 @@ export default defineConfig({
   globalSetup: require.resolve('./utils/global-setup'),
   testDir: './tests',
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
+forbidOnly: process.env.CI === 'true',
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   // Required for Ortoni to read test artifacts
@@ -83,7 +83,7 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  projects: [
+  projects: [ 
     {
       name: 'Ally_chromium',
       use: {
