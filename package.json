@@ -10,10 +10,11 @@
   "main": "index.js",
   "packages": {},
   "devDependencies": {
-    "@faker-js/faker": "^10.1.0",
+    "@faker-js/faker": "^8.4.1",
     "@playwright/test": "^1.56.1",
-    "@types/node": "^24.10.1",
-    "ortoni-report": "^4.0.1"
+    "@types/node": "^20.11.30",
+    "ortoni-report": "^4.0.1",
+    "typescript": "^5.4.5"
   },
   "scripts": {},
   "dependencies": {
