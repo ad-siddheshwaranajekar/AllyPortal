@@ -5,7 +5,7 @@ import * as os from "os";
 //
 import dotenv from 'dotenv';
 
-const envName = process.env.ENV || 'qat';
+const envName = process.env.ENV || 'uat';
 console.log('👉 Loading ENV:', envName);
 
 dotenv.config({

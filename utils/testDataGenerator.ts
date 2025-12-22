@@ -8,7 +8,7 @@ export function generateUser() {
   return {
     firstName,
     lastName,
-    username: `${twoDigits}${lastName}${twoDigits}${firstName}`,       // Dhanush01
+    username: `${lastName}${twoDigits}${firstName}`,       // Dhanush01
     email: `${firstName}.${twoDigits}@yopmail.com`,        // Dhanush.Kumar23@yopmail.com
     phone: faker.phone.number("##########")                // Random 10-digit phone
   };

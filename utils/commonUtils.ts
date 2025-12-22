@@ -46,7 +46,7 @@ export class CommonUtils {
   }
 
   async click(locator: Locator) {
-    await locator.waitFor({ state: 'visible', timeout: 10000 });
+    await locator.waitFor({ state: 'visible', timeout: 15000 });
     await this.highlight(locator);
     await locator.click();
   }

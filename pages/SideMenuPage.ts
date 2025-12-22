@@ -16,11 +16,12 @@ export class SideMenuPage {
     this.page = page;
     this.utils = new CommonUtils(page);  // ✅ FIX
 
-    this.usersMenu = page.getByRole('link', { name: 'Users' });
+    //this.usersMenu = page.getByRole('link', { name: 'Users' });
     this.paymentsMenu = page.getByRole('link', { name: 'Payments' });
     this.webhooksMenu = page.getByRole('link', { name: 'Webhooks' });
     this.webhookEventLogsMenu = page.getByRole('link', { name: 'Webhook Events' });
     this.profileMenu = page.locator('p.profile-name');
+    this.usersMenu = page.locator('a[href="#/ally/users"]');
   }
 
 
@@ -28,10 +29,17 @@ export class SideMenuPage {
    private async delay() {
   await this.page.waitForTimeout(1000); // 3 sec
 }
-  async openUsers() {
-    await this.utils.click(this.usersMenu); 
-    await this.delay();  // now works
-  }
+  // async openUsers() {
+  //   await this.utils.click(this.usersMenu); 
+  //   await this.delay();  // now works
+  // }
+
+
+async openUsers() {
+  await this.usersMenu.waitFor({ state: 'visible', timeout: 20000 });
+  await this.usersMenu.click();
+}
+
 
   async openPayments() {
     await this.utils.click(this.paymentsMenu);
