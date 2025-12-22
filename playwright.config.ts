@@ -57,10 +57,8 @@ export default defineConfig({
   globalSetup: require.resolve('./utils/global-setup'),
   testDir: './tests',
   fullyParallel: true,
-  // playwright.config.ts
-forbidOnly: process.env.CI === 'true',
-
-  //forbidOnly: !!process.env.CI,
+ 
+  forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   // Required for Ortoni to read test artifacts
