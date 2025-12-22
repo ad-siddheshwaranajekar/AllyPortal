@@ -10,7 +10,9 @@ export function generateUser() {
     lastName,
     username: `${lastName}${twoDigits}${firstName}`,
     email: `${firstName}.${twoDigits}@yopmail.com`,
-    phone: faker.phone.number('##########')
+    phone1: faker.phone.number(),                  // random phone
+    phone2: faker.string.numeric(10),             // 10-digit number
+    phone3: faker.helpers.fromRegExp("\\d{10}")   // 10-digit number using regex
   };
 }
 
