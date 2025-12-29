@@ -3,20 +3,20 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-
     "strict": true,
     "skipLibCheck": true,
-
     "sourceMap": true,
-
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-
     "types": ["node", "playwright"],
-
     "resolveJsonModule": true,
-
     "verbatimModuleSyntax": false,
-    "isolatedModules": false
+    "isolatedModules": false,
+    "baseUrl": ".",                   // Add this
+    "paths": {
+      "@siddheshwar-anajekar/common-base": [
+        "node_modules/@siddheshwar-anajekar/common-base/dist"
+      ]
+    }
   }
 }

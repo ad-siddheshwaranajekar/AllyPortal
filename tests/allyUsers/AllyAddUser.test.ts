@@ -1,44 +1,47 @@
 import { test, expect } from '@playwright/test';
+import { LoginPage } from '../../pages/login/loginPage';
 import { AddUserPage } from '../../pages/users/addUserPage';
-import { CommonUtils } from '../../utils/commonUtils';
 import { generateUser } from '../../utils/testDataGenerator';
+import { SideMenuPage } from '../../pages/SideMenuPage';
+import { CommonUtils } from '../../utils/commonUtils';
 
-// Generate test data
 const user = generateUser();
 
 test.describe('Add ally users tests', () => {
+  let loginPage: LoginPage;
   let addUserPage: AddUserPage;
+  let sideMenuPage: SideMenuPage;
   let commonUtils: CommonUtils;
 
   test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
     addUserPage = new AddUserPage(page);
+    sideMenuPage = new SideMenuPage(page);
     commonUtils = new CommonUtils(page);
 
-    // ✅ Page is already logged in via storageState in playwright.config.ts
-    await page.goto('/#/ally/users');
+    // Navigate to login and log in
+    await loginPage.navigate();
+    await loginPage.login(process.env.USERNAME!, process.env.PASSWORD!);
 
-    // Wait for stable element to ensure page is loaded
-    await page.waitForSelector('div.header', { timeout: 15000 });
+   
   });
 
   test('Verify that an Ally can create a Basic Auth Ally user', async ({ page }) => {
     await addUserPage.AddUserBtn.click();
-    await expect(addUserPage.AddUserTxt).toBeVisible({ timeout: 15000 });
+    await expect(addUserPage.AddUserTxt).toBeVisible();
 
-    // Fill form
     await addUserPage.userNameTxt.fill(user.username);
     await addUserPage.basicAuthBtn.click();
     await addUserPage.firstNameInputBox.fill(user.firstName);
     await addUserPage.lastNameInputBox.fill(user.lastName);
-    await addUserPage.phoneNumberInputBox.fill(user.phone);
+    await addUserPage.phoneNumberInputBox.fill("8234560789");
     await addUserPage.emailInputBox.fill(user.email);
-
     await addUserPage.saveButton.click();
 
-    // ✅ Wait for toast safely
     const successToast = page.locator('.toast-message', { hasText: 'User added successfully' });
     await expect(successToast).toBeVisible({ timeout: 15000 });
   });
+
 
 
 
@@ -94,7 +97,7 @@ test.describe('Add ally users tests', () => {
     await addUserPage.apiKeyBtn.click();
    await addUserPage.firstNameInputBox.fill(user.firstName);
    await addUserPage.lastNameInputBox.fill(user.lastName);
-   await addUserPage.phoneNumberInputBox.fill(user.phone);
+   await addUserPage.phoneNumberInputBox.fill("9876543210");
     await addUserPage.emailInputBox.fill(user.email);
     await page.waitForTimeout(1000);
     await addUserPage.saveButton.click();

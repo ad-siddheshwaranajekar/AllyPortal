@@ -1,22 +1,21 @@
 import { defineConfig, devices } from '@playwright/test';
 import { OrtoniReportConfig } from "ortoni-report";
 import * as os from "os";
-
-//
 import dotenv from 'dotenv';
 
-const envName = process.env.ENV || 'uat';
-console.log('👉 Loading ENV:', envName);
-
+// ✅ Load env once
+const envName = process.env.ENV || 'qat';
 dotenv.config({
   path: `./config/${envName}.env`,
-   override: true,
+  override: true,
+  debug: false,
 });
 
-console.log('👉 USERNAME from env:', process.env.USERNAME);
-console.log('👉 BASE_URL from env:', process.env.BASE_URL);
+console.log('👉 Loaded ENV:', envName);
+// console.log('👉 USERNAME from env:', process.env.USERNAME);
+// console.log('👉 BASE_URL from env:', process.env.BASE_URL);
 
-
+// Optional report config
 const reportConfig: OrtoniReportConfig = {
   open: process.env.CI ? "never" : "always",
   folderPath: "my-report",
@@ -25,66 +24,43 @@ const reportConfig: OrtoniReportConfig = {
   showProject: false,
   projectName: "Ally Portal",
   testType: "E2E-Functional",
-  
   authorName: os.userInfo().username,
   base64Image: false,
-
-  // Branding
- // logo: "AndDone.png",
-  headerText: "Ally Portal UI Automation Report",  // custom property
-  //customCss: "custom.css",
-logo: "./assets/AllyLogoDark.svg",
-
-
-  // Enables clickable dashboard
+  headerText: "Ally Portal UI Automation Report",
+  logo: "./assets/AllyLogoDark.svg",
   stdIO: true,
-
   meta: {
     "Test Cycle": "AN_ALMGMT_V12",
-   // Environment: process.env.NODE_ENV || "QAT",
-    "Executed On": new Date().toLocaleString(), 
+    "Executed On": new Date().toLocaleString(),
     version: "1",
     release: "V12",
     platform: os.type(),
   },
-} as any;  // <-- bypass TypeScript type checking for headerText
-
-
-  
-
+} as any;
 
 export default defineConfig({
-  globalSetup: require.resolve('./utils/global-setup'),
   testDir: './tests',
   fullyParallel: true,
- 
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  // Required for Ortoni to read test artifacts
   outputDir: "test-results",
 
-  //  Existing HTML report + Allure added
+  // reporters
   reporter: [
-    
- // ["ortoni-report", reportConfig],
-   ['html']   
-                    // existing
-        
+  //  ['html']
+     ["ortoni-report", reportConfig], // optional
   ],
- 
 
   use: {
     baseURL: process.env.BASE_URL,
-    storageState: 'auth/auth.json',
     trace: 'on-first-retry',
     viewport: null,
-    // optional but useful for Allure:
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
 
-  projects: [ 
+  projects: [
     {
       name: 'Ally_chromium',
       use: {
@@ -96,32 +72,5 @@ export default defineConfig({
         },
       },
     },
-
-  //    {
-  //     name: 'Mobile Safari',
-  //     use: {
-  //       ...devices['iPhone 13'],
-  //     },
-  //   }, 
-  // {
-  //   name: 'Mobile Chrome (Pixel 5)',
-  //   use: {
-  //     ...devices['Pixel 5'], // Emulates a Pixel 5 with Chrome
-  //   },
-  // },
-
-    // Edge project kept commented as you had it
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: {
-    //     ...devices['Desktop Edge'],
-    //     channel: 'msedge',
-    //     viewport: null,
-    //     deviceScaleFactor: undefined,
-    //     launchOptions: {
-    //       args: ['--start-maximized'],
-    //     },
-    //   },
-    // },
   ],
 });

@@ -1,6 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { BasePage } from '../basePage';
-import { CommonUtils } from '../../utils/commonUtils';
+import { BasePage, commonUtils } from '@siddheshwar.anajekar/common-base';
+
 
 export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
@@ -24,37 +24,39 @@ export class LoginPage extends BasePage {
     this.usernameInput = page.locator('#loginUsername');
     this.passwordInput = page.locator('#loginPassword');
     this.loginButton = page.locator('#login-button');
-    this.logo = page.locator("img.anddone-logo");
-    this.forgotPassword = page.locator("text=Forgot Password?");
-    this.recoverPasswordText = page.locator("text=Recover Password");
+    this.logo = page.locator('img.anddone-logo');
+    this.forgotPassword = page.locator('text=Forgot Password?');
+    this.recoverPasswordText = page.locator('text=Recover Password');
     this.usernameForResetPasswordInput = page.locator('#userEmail');
     this.alertMessage = page.locator('text=User Name is invalid');
     this.submitButton = page.locator('.button.button-green');
     this.successMessage = page.locator('.toast-success');
   }
 
+  /** Navigate to login page */
   async navigate() {
-    await this.page.goto(this.url);
+    await this.navigateTo(this.url); // Uses BasePage.navigateTo
   }
 
+  /** Fill credentials and click login */
   async login(username: string, password: string) {
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
-
-    
+    await this.fill(this.usernameInput, username);
+    await this.fill(this.passwordInput, password);
+    await this.click(this.loginButton);
   }
 
+  /** Login using portal env variables */
   async loginAsAlly() {
     await this.login(
-      CommonUtils.getEnvVariable('USERNAME'),
-      CommonUtils.getEnvVariable('PASSWORD')
+      commonUtils.getEnv('USERNAME'),
+      commonUtils.getEnv('PASSWORD')
     );
   }
 
+  /** Forgot password flow */
   async navigateToForgotPassword() {
     await this.navigate();
-    await this.forgotPassword.click();
+    await this.click(this.forgotPassword);
     await expect(this.recoverPasswordText).toBeVisible();
   }
 }
