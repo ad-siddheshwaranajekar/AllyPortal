@@ -48,8 +48,8 @@ export default defineConfig({
 
   // reporters
   reporter: [
-  //  ['html']
-     ["ortoni-report", reportConfig], // optional
+   ['html']
+  //   ["ortoni-report", reportConfig], // optional
   ],
 
   use: {
