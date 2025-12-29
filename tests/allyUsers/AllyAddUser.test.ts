@@ -3,7 +3,7 @@ import { LoginPage } from '../../pages/login/loginPage';
 import { AddUserPage } from '../../pages/users/addUserPage';
 import { generateUser } from '../../utils/testDataGenerator';
 import { SideMenuPage } from '../../pages/SideMenuPage';
-import { CommonUtils } from '../../utils/commonUtils';
+import { commonUtils } from '@siddheshwar.anajekar/common-base';
 
 const user = generateUser();
 
@@ -11,13 +11,13 @@ test.describe('Add ally users tests', () => {
   let loginPage: LoginPage;
   let addUserPage: AddUserPage;
   let sideMenuPage: SideMenuPage;
-  let commonUtils: CommonUtils;
+
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     addUserPage = new AddUserPage(page);
     sideMenuPage = new SideMenuPage(page);
-    commonUtils = new CommonUtils(page);
+ 
 
     // Navigate to login and log in
     await loginPage.navigate();

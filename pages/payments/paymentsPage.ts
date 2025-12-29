@@ -1,11 +1,10 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { CommonUtils } from '../../utils/commonUtils';
+import { commonUtils, BasePage } from '@siddheshwar.anajekar/common-base';
 
-import { BasePage } from '../basePage';
 
 export class PaymentsPage extends BasePage {
   readonly page: Page;
-  readonly utils: CommonUtils;
+  readonly utils: commonUtils;
   //payemnt table
   readonly headerTxt: Locator;
   readonly filterTable: Locator;
@@ -56,7 +55,7 @@ export class PaymentsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.page = page;
-    this.utils = new CommonUtils(page);
+    this.utils = new commonUtils(page);
 
     this.headerTxt = page.getByRole('heading', { name: /Welcome,/, exact: false });
     this.filterTable = page.locator('div.filter-container');

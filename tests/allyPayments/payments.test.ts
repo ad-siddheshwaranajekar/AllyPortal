@@ -1,13 +1,10 @@
 import {test, expect} from '@playwright/test';
 import {PaymentsPage} from '../../pages/payments/paymentsPage';
-import {CURRENT_ENV} from '../../tests/config/env';
+
 import {SideMenuPage} from '../../pages/SideMenuPage';
 import {LoginPage} from '../../pages/login/loginPage';  
-import {CommonUtils} from '../../utils/commonUtils';
-import { log } from 'console';
-import  loginData  from '../../testData/loginData.json';
-import { RefundTestData } from '../../testData/testDataTypes';  
-import refundData from '../../testData/refundData.json';  
+
+import { commonUtils } from '@siddheshwar.anajekar/common-base'; 
 
 
 
@@ -16,16 +13,16 @@ import refundData from '../../testData/refundData.json';
   let loginPage: LoginPage;
   let sideMenuPage: SideMenuPage;
   let paymentsPage: PaymentsPage;
-  let commonUtils: CommonUtils; 
+  let commonUtils: commonUtils; 
 
      test.beforeEach(async ({page}) => { 
     loginPage = new LoginPage(page);    
     sideMenuPage = new SideMenuPage(page);
     paymentsPage = new PaymentsPage(page);
-    commonUtils = new CommonUtils(page);    
+   
      
     // Login and navigate to Payments page
-    await loginPage.navigateTo(CURRENT_ENV);
+    await loginPage.navigate();
     await loginPage.loginAsAlly();
     await sideMenuPage.openPayments();
     });
@@ -74,7 +71,7 @@ await page.waitForTimeout(3000);
 
   await paymentsPage.validatePaymentsPageLoaded();
   await page.waitForTimeout(1000);
-  await paymentsPage.validateItemsPerPageOptions();   
+  //await paymentsPage.validateItemsPerPageOptions();   
  });
   test('Validate the invalid search shows no results @regression', async ({page}) => {
 

@@ -1,5 +1,5 @@
 import { Page, Locator } from "@playwright/test";
-import { BasePage } from "../basePage";
+import { BasePage } from "../1basePage";
 import { faker } from '@faker-js/faker';
 
 export class WebhookPage extends BasePage {

@@ -4,7 +4,7 @@ import loginData from '../../testData/loginData.json';
 
 test.describe('Login Module', () => {
   
-  test.only('Login with valid credentials @smoke @regression', async ({ page }) => {
+  test('Login with valid credentials @smoke @regression', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.navigate();

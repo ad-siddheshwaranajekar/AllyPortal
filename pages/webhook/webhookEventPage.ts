@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { BasePage } from "../basePage";
+import { BasePage } from "../1basePage";
 export class WebhookEventPage extends BasePage {
   readonly webhookEventsHeader: Locator;
   readonly uRLSortIcon: Locator;

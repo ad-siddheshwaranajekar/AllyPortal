@@ -1,10 +1,10 @@
 import { Page, Locator } from '@playwright/test';
-import { CommonUtils } from '../utils/commonUtils';
+import { commonUtils } from '@siddheshwar.anajekar/common-base';
 import { th } from '@faker-js/faker';
 
 export class SideMenuPage {
   readonly page: Page;
-  readonly utils: CommonUtils;
+  readonly utils: commonUtils;
 
   readonly usersMenu: Locator;
   readonly paymentsMenu: Locator; 
@@ -14,7 +14,7 @@ export class SideMenuPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.utils = new CommonUtils(page);  // ✅ FIX
+    this.utils = new commonUtils(page);  // ✅ FIX
 
     //this.usersMenu = page.getByRole('link', { name: 'Users' });
     this.paymentsMenu = page.getByRole('link', { name: 'Payments' });

@@ -1,5 +1,5 @@
 import { Page, expect, Locator } from "@playwright/test"; 
-import { BasePage } from "../basePage";
+import { BasePage } from "../1basePage";
 import { CURRENT_ENV } from "../../tests/config/env";
 import { CommonUtils } from "../../utils/commonUtils";
 import { th } from "@faker-js/faker"; // Use environment variable at runtime instead of a missing module import. 
