@@ -1,7 +1,7 @@
 import { Page, expect, Locator } from "@playwright/test"; 
-import { BasePage } from "../1basePage";
-import { CURRENT_ENV } from "../../tests/config/env";
-import { CommonUtils } from "../../utils/commonUtils";
+import { BasePage} from '@siddheshwar.anajekar/common-base';
+import { commonUtils } from '@siddheshwar.anajekar/common-base';
+
 import { th } from "@faker-js/faker"; // Use environment variable at runtime instead of a missing module import. 
  
 
@@ -29,7 +29,10 @@ readonly emailValdation :Locator
 
 readonly url: string;
 
-constructor(page: Page) { super(page); this.url = CURRENT_ENV; // use CURRENT_ENV instead of hardcoding
+constructor(page: Page) { 
+super(page);
+  const env = process.env.TEST_ENV || 'QAT';
+    this.url = process.env[`ALLY_BASE_URL_${env}`] || 'https://ally.qat.anddone.com';
 this.profileMenu = page.locator('p.profile-name');
 this.profileButton = page.getByText('Profile', { exact: true }).first();
 this.logoutButton = page.getByText('Log Out', { exact: true }).first();

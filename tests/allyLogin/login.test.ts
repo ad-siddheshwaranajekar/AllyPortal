@@ -1,14 +1,26 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/login/loginPage';
-import loginData from '../../testData/loginData.json';
+
+
 
 test.describe('Login Module', () => {
   
-  test('Login with valid credentials @smoke @regression', async ({ page }) => {
+  test.only('Login with valid credentials @smoke @regression', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+   
+    await loginPage.navigate();
+    await loginPage.loginAsAlly('1'); // Uses .env credentials via CommonUtils
+
+    const usersHeader = page.locator("//h3[normalize-space()='Users']");
+    await expect(usersHeader).toBeVisible({ timeout: 15000 });
+    await expect(usersHeader).toHaveText('Users');
+  });
+
+    test.only('B Login with valid credentials @smoke @regression', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.navigate();
-    await loginPage.loginAsAlly(); // Uses .env credentials via CommonUtils
+    await loginPage.loginAsAlly('2'); // Uses .env credentials via CommonUtils
 
     const usersHeader = page.locator("//h3[normalize-space()='Users']");
     await expect(usersHeader).toBeVisible({ timeout: 15000 });
@@ -22,7 +34,7 @@ test.describe('Login Module', () => {
     await loginPage.navigate();
 
     // Use loginData for negative test
-    await loginPage.login(loginData[1].username, loginData[1].password);
+   await loginPage.loginAsAlly('2');
 
     const errorAlert = page.locator(
       "//div[@role='alert' and @aria-label='We could not log you in. Please check your credentials and try again.']"
@@ -50,7 +62,7 @@ test.describe('Login Module', () => {
     const loginPage = new LoginPage(page);
     await loginPage.navigateToForgotPassword();
 
-    await loginPage.usernameForResetPasswordInput.fill(loginData[2].username);
+    await loginPage.usernameForResetPasswordInput.fill("alltestuser");
     await loginPage.submitButton.click();
     await expect(loginPage.successMessage).toBeVisible({ timeout: 15000 });
   });
@@ -59,7 +71,7 @@ test.describe('Login Module', () => {
     const loginPage = new LoginPage(page);
     await loginPage.navigateToForgotPassword();
 
-    await loginPage.usernameForResetPasswordInput.fill(loginData[1].username);
+    await loginPage.usernameForResetPasswordInput.fill("invalidUser");
     await loginPage.submitButton.click();
 
     // Avoid fixed waits if possible

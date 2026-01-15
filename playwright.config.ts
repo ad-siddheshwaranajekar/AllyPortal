@@ -1,59 +1,43 @@
 import { defineConfig, devices } from '@playwright/test';
-import { OrtoniReportConfig } from "ortoni-report";
-import * as os from "os";
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+import { validateEnv } from './utils/envValidator';
 
-// ✅ Load env once
-const envName = process.env.ENV || 'qat';
-dotenv.config({
-  path: `./config/${envName}.env`,
-  override: true,
-  debug: false,
-});
+// Load .env only for LOCAL (CI injects env vars automatically)
+dotenv.config({ path: './utils/.env' });
 
-console.log('👉 Loaded ENV:', envName);
-// console.log('👉 USERNAME from env:', process.env.USERNAME);
-// console.log('👉 BASE_URL from env:', process.env.BASE_URL);
+// Default environment = QAT
+const ENV = (process.env.TEST_ENV || 'QAT').toUpperCase();
+process.env.TEST_ENV = ENV;
 
-// Optional report config
-const reportConfig: OrtoniReportConfig = {
-  open: process.env.CI ? "never" : "always",
-  folderPath: "my-report",
-  filename: "Ally Portal.html",
-  title: "Ally Portal UI Test Report",
-  showProject: false,
-  projectName: "Ally Portal",
-  testType: "E2E-Functional",
-  authorName: os.userInfo().username,
-  base64Image: false,
-  headerText: "Ally Portal UI Automation Report",
-  logo: "./assets/AllyLogoDark.svg",
-  stdIO: true,
-  meta: {
-    "Test Cycle": "AN_ALMGMT_V12",
-    "Executed On": new Date().toLocaleString(),
-    version: "1",
-    release: "V12",
-    platform: os.type(),
-  },
-} as any;
+// Fail fast if env / creds / baseURL missing
+validateEnv();
+
+// Centralized base URLs
+const BASE_URLS: Record<string, string> = {
+  DEV: 'https://ally.dev.anddone.com',
+  QAT: 'https://ally.qat.anddone.com',
+  UAT: 'https://ally.uat.anddone.com',
+};
+
+const baseURL = BASE_URLS[ENV];
+if (!baseURL) {
+  throw new Error(`Base URL not configured for environment: ${ENV}`);
+}
 
 export default defineConfig({
   testDir: './tests',
+
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  outputDir: "test-results",
 
-  // reporters
-  reporter: [
-   ['html']
-  //   ["ortoni-report", reportConfig], // optional
-  ],
+  outputDir: 'test-results',
+
+  reporter: [['html']],
 
   use: {
-    baseURL: process.env.BASE_URL,
+    baseURL,
     trace: 'on-first-retry',
     viewport: null,
     screenshot: 'only-on-failure',

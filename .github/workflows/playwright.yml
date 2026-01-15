@@ -3,10 +3,10 @@ name: Playwright Tests
 on:
   workflow_dispatch:
     inputs:
-      env:
-        description: "Select Environment"
-        required: true
-        default: "QAT"
+      environment:
+        description: "Select environment"
+        required: false          # 🔹 not required
+        default: QAT             # 🔥 DEFAULT ENV
         type: choice
         options:
           - DEV
@@ -14,97 +14,16 @@ on:
           - UAT
 
 jobs:
-  test:
+  playwright-tests:
     runs-on: ubuntu-latest
 
+    # 🔥 Picks QAT automatically if nothing is selected
+    environment: ${{ github.event.inputs.environment || 'QAT' }}
+
+    env:
+      TEST_ENV: ${{ github.event.inputs.environment || 'QAT' }}
+
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
-
-      # Setup Node.js
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      # Cache node modules for faster CI
-      - name: Cache NPM modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      # Clean previous reports
-      - name: Clean previous reports
-        run: |
-          rm -rf my-report/ playwright-report/ test-results/
-
-      # Install dependencies and Playwright browsers
       - run: npm ci
-      - run: npx playwright install --with-deps
-
-      # Set environment variables based on workflow input
-      - name: Set environment variables
-        run: |
-          ENV_SELECTED="${{ github.event.inputs.env }}"
-          echo "Selected environment: $ENV_SELECTED"
-
-          case "$ENV_SELECTED" in
-            DEV)
-              echo "ENV=dev" >> $GITHUB_ENV
-              echo "BASE_URL=${{ secrets.BASE_URL_DEV }}" >> $GITHUB_ENV
-              echo "USERNAME=${{ secrets.LOGIN_USERNAME_DEV }}" >> $GITHUB_ENV
-              echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_DEV }}" >> $GITHUB_ENV
-              ;;
-            QAT)
-              echo "ENV=qat" >> $GITHUB_ENV
-              echo "BASE_URL=${{ secrets.BASE_URL_QAT }}" >> $GITHUB_ENV
-              echo "USERNAME=${{ secrets.LOGIN_USERNAME_QAT }}" >> $GITHUB_ENV
-              echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_QAT }}" >> $GITHUB_ENV
-              ;;
-            UAT)
-              echo "ENV=uat" >> $GITHUB_ENV
-              echo "BASE_URL=${{ secrets.BASE_URL_UAT }}" >> $GITHUB_ENV
-              echo "USERNAME=${{ secrets.LOGIN_USERNAME_UAT }}" >> $GITHUB_ENV
-              echo "PASSWORD=${{ secrets.LOGIN_PASSWORD_UAT }}" >> $GITHUB_ENV
-              ;;
-          esac
-
-      # Validate required environment variables
-      - name: Validate environment variables
-        run: |
-          if [ -z "$BASE_URL" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
-            echo "Error: Required environment variables are missing!"
-            exit 1
-          fi
-
-      # Run Playwright tests
-      - name: Run Playwright Tests
-        env:
-          ENV: ${{ env.ENV }}
-          BASE_URL: ${{ env.BASE_URL }}
-          USERNAME: ${{ env.USERNAME }}
-          PASSWORD: ${{ env.PASSWORD }}
-          CI: true
-        run: |
-          echo "Running Playwright tests on $ENV"
-          npx playwright test
-
-      # Upload Playwright HTML report
-      - name: Upload Playwright HTML Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-html-report
-          path: playwright-report/
-          retention-days: 30
-
-      # Upload Playwright test artifacts (screenshots, videos, traces)
-      - name: Upload Playwright Test Artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-artifacts
-          path: test-results/
-          retention-days: 31
+      - run: npx playwright test

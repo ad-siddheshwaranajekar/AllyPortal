@@ -1,6 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { BasePage, commonUtils } from '@siddheshwar.anajekar/common-base';
-
+import { BasePage } from '@siddheshwar.anajekar/common-base';
+import { getAllyCredentials } from '../../utils/credentials'; // NEW
 
 export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
@@ -19,7 +19,10 @@ export class LoginPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
-    this.url = process.env.BASE_URL!;
+    // Automatically pick baseURL based on TEST_ENV
+    this.url =
+      process.env[`ALLY_BASE_URL_${process.env.TEST_ENV}`] ||
+      'https://ally.qat.anddone.com'; // default QAT fallback
 
     this.usernameInput = page.locator('#loginUsername');
     this.passwordInput = page.locator('#loginPassword');
@@ -35,7 +38,7 @@ export class LoginPage extends BasePage {
 
   /** Navigate to login page */
   async navigate() {
-    await this.navigateTo(this.url); // Uses BasePage.navigateTo
+    await this.navigateTo(this.url);
   }
 
   /** Fill credentials and click login */
@@ -45,12 +48,10 @@ export class LoginPage extends BasePage {
     await this.click(this.loginButton);
   }
 
-  /** Login using portal env variables */
-  async loginAsAlly() {
-    await this.login(
-      commonUtils.getEnv('USERNAME'),
-      commonUtils.getEnv('PASSWORD')
-    );
+  /** Login using portal env variables + multi-user support */
+  async loginAsAlly(allyNumber: '1' | '2' | '3') {
+    const { username, password } = getAllyCredentials(allyNumber);
+    await this.login(username, password);
   }
 
   /** Forgot password flow */

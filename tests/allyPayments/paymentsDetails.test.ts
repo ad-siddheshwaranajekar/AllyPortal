@@ -23,7 +23,7 @@ test.describe('Payments Module', () => {
      
     // Login and navigate to Payments page
     await loginPage.navigateTo(CURRENT_ENV);
-    await loginPage.loginAsAlly();
+    await loginPage.loginAsAlly('A');
     await sideMenuPage.openPayments();
     });
 
