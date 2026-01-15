@@ -5,8 +5,8 @@ on:
     inputs:
       environment:
         description: "Select environment"
-        required: false          # 🔹 not required
-        default: QAT             # 🔥 DEFAULT ENV
+        required: false
+        default: QAT
         type: choice
         options:
           - DEV
@@ -14,15 +14,34 @@ on:
           - UAT
 
 jobs:
-  playwright-tests:
+  dev:
+    if: ${{ github.event.inputs.environment == 'DEV' }}
     runs-on: ubuntu-latest
-
-    # 🔥 Picks QAT automatically if nothing is selected
-    environment: ${{ github.event.inputs.environment || 'QAT' }}
-
+    environment: DEV   # literal string, required for secrets
     env:
-      TEST_ENV: ${{ github.event.inputs.environment || 'QAT' }}
+      TEST_ENV: DEV
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npx playwright test
 
+  qat:
+    if: ${{ github.event.inputs.environment == 'QAT' || github.event.inputs.environment == '' }}
+    runs-on: ubuntu-latest
+    environment: QAT
+    env:
+      TEST_ENV: QAT
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npx playwright test
+
+  uat:
+    if: ${{ github.event.inputs.environment == 'UAT' }}
+    runs-on: ubuntu-latest
+    environment: UAT
+    env:
+      TEST_ENV: UAT
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
