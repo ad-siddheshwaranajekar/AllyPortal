@@ -17,35 +17,47 @@ jobs:
   dev:
     if: ${{ github.event.inputs.environment == 'DEV' }}
     runs-on: ubuntu-latest
-    environment: DEV   # must exist in GitHub repo Settings → Environments → DEV
+    environment: DEV   # must exist in GitHub repo
     env:
       TEST_ENV: DEV
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
+      - name: Check DEV secrets
+        run: |
+          echo "DEVALLY1USERNAME=${DEVALLY1USERNAME:-<not set>}"
+          echo "DEVALLY1PASSWORD=${DEVALLY1PASSWORD:+<set>}"
       - name: Run Playwright DEV tests
         run: npx playwright test
 
   qat:
-    if: ${{ github.event.inputs.environment == 'QAT' || github.event.inputs.environment == '' }}
+    if: ${{ github.event.inputs.environment == 'QAT' || github.event.inputs.environment == null || github.event.inputs.environment == '' }}
     runs-on: ubuntu-latest
-    environment: QAT   # must exist in GitHub repo Settings → Environments → QAT
+    environment: QAT   # must exist in GitHub repo
     env:
       TEST_ENV: QAT
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
+      - name: Check QAT secrets
+        run: |
+          echo "QATALLY1USERNAME=${QATALLY1USERNAME:-<not set>}"
+          echo "QATALLY1PASSWORD=${QATALLY1PASSWORD:+<set>}"
       - name: Run Playwright QAT tests
         run: npx playwright test
 
   uat:
     if: ${{ github.event.inputs.environment == 'UAT' }}
     runs-on: ubuntu-latest
-    environment: UAT   # must exist in GitHub repo Settings → Environments → UAT
+    environment: UAT   # must exist in GitHub repo
     env:
       TEST_ENV: UAT
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
+      - name: Check UAT secrets
+        run: |
+          echo "UATALLY1USERNAME=${UATALLY1USERNAME:-<not set>}"
+          echo "UATALLY1PASSWORD=${UATALLY1PASSWORD:+<set>}"
       - name: Run Playwright UAT tests
         run: npx playwright test
