@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  globalSetup: require.resolve('./global-setup.ts'), // ✅ use global setup
+  globalSetup: require.resolve('./utils/loginUtils/global-setup.ts'),
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
