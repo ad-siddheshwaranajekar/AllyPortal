@@ -1,5 +1,10 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '@siddheshwar.anajekar/common-base';
+import { commonUtils } from '@siddheshwar.anajekar/common-base';
+import { AssertionUtils } from '@siddheshwar.anajekar/common-base';
+//import AssertionUtils from "@siddheshwar.anajekar/common-base";
+
+
 import { getAllyCredentials } from '../../utils/credentials'; // NEW
 
 export class LoginPage extends BasePage {
@@ -44,6 +49,7 @@ export class LoginPage extends BasePage {
   /** Fill credentials and click login */
   async login(username: string, password: string) {
     await this.fill(this.usernameInput, username);
+    AssertionUtils.verifyTrue(true, 'Username input filled'); // Example assertion
     await this.fill(this.passwordInput, password);
     await this.click(this.loginButton);
   }
